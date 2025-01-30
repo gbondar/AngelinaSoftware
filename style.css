@@ -90,6 +90,27 @@ button:hover {
     font-weight: bold;
 }
 
+.modal-buttons {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.modal-buttons button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin-left: 10px;
+}
+
+.modal-buttons button:hover {
+    background-color: #2980b9;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .modal-content {

@@ -72,3 +72,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 });
+
+function agregarInsumo() {
+    alert("Función para agregar un insumo (a implementar)");
+}
+
+function modificarInsumo() {
+    alert("Función para modificar un insumo (a implementar)");
+}
+
+function eliminarInsumo() {
+    alert("Función para eliminar un insumo (a implementar)");
+}
