@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("closeModal").addEventListener("click", closeModal);
     document.getElementById("closeAddModal").addEventListener("click", closeAddModal);
 
+    //funciones de lectura en la bbdd 
+
     function fetchInsumos() {
         fetch("http://localhost:5000/api/insumos")
             .then(response => {
@@ -33,6 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
+
+
+    //Esta funcion le da formato a la tabla que se muestra al abrir insumos
+
     function renderTable(data) {
         insumosContainer.innerHTML = ""; 
         data.forEach(insumo => {
@@ -47,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Funciones para mostrar o ocultar los modals, no tiene otra funcion que eso
     function openModal() {
         modal.style.display = "flex";
     }
@@ -62,6 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeAddModal() {
         addModal.style.display = "none";
     }
+
+
+    //Aqui empiezan las funciones de eventos que modifican la bbdd
 
     function addInsumo(event) {
         event.preventDefault(); 
@@ -104,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    //Cierra al tocar afuera de los modals
     window.onclick = function (event) {
         if (event.target === modal) {
             closeModal();
