@@ -1,11 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("modal");
-    const insumosContainer = document.getElementById("insumos-container");
+    const addModal = document.getElementById("addModal");
+    const insumosContainer = document.getElementById("tableBody");
 
-     // Asegurar que el modal esté oculto al inicio
-     modal.style.display = "none";
+    // Asegurar que los modales inicien cerrados
+    modal.style.display = "none";
+    addModal.style.display = "none";
 
-    document.querySelector("button").addEventListener("click", fetchInsumos);
+    document.getElementById("btnInsumos").addEventListener("click", fetchInsumos);
+    document.getElementById("btnAgregarInsumo").addEventListener("click", openAddModal);
+    document.getElementById("btnAddInsumo").addEventListener("click", addInsumo);
+    document.getElementById("btnCancelInsumo").addEventListener("click", closeAddModal);
+
+    // Agregar eventos a las cruces de los modales
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("closeAddModal").addEventListener("click", closeAddModal);
 
     function fetchInsumos() {
         fetch("http://localhost:5000/api/insumos")
@@ -25,24 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderTable(data) {
-        insumosContainer.innerHTML = ""; // Limpiar contenido anterior
-        
-        const table = document.createElement("table");
-        table.classList.add("insumos-table");
-        table.innerHTML = `
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Cantidad</th>
-                    <th>Unidad</th>
-                    <th>Precio Unitario</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        `;
-
-        const tbody = table.querySelector("tbody");
+        insumosContainer.innerHTML = ""; 
         data.forEach(insumo => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -51,36 +43,72 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${insumo.unidad_medida}</td>
                 <td>$${insumo.precio_unitario}</td>
             `;
-            tbody.appendChild(row);
+            insumosContainer.appendChild(row);
         });
-
-        insumosContainer.appendChild(table);
     }
 
     function openModal() {
-        modal.style.display = "block";
+        modal.style.display = "flex";
     }
 
-    window.closeModal = function () {
+    function closeModal() {
         modal.style.display = "none";
-    };
+    }
 
-    // Cerrar el modal si se hace clic fuera del contenido
+    function openAddModal() {
+        addModal.style.display = "flex";
+    }
+
+    function closeAddModal() {
+        addModal.style.display = "none";
+    }
+
+    function addInsumo(event) {
+        event.preventDefault(); 
+
+        const nombre = document.getElementById("nombre").value.trim();
+        const unidad = document.getElementById("unidad").value.trim();
+        const cantidad = document.getElementById("cantidad").value.trim();
+        const precio = document.getElementById("precio").value.trim();
+
+        if (!nombre || !unidad || !cantidad || !precio) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+
+        fetch("http://localhost:5000/api/insumos", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nombre,
+                unidad_medida: unidad,
+                cantidad: parseFloat(cantidad),
+                precio_unitario: parseFloat(precio),
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al agregar el insumo");
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert("Insumo agregado con éxito");
+            closeAddModal();
+            fetchInsumos(); 
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+
     window.onclick = function (event) {
         if (event.target === modal) {
             closeModal();
+        } else if (event.target === addModal) {
+            closeAddModal();
         }
     };
 });
-
-function agregarInsumo() {
-    alert("Función para agregar un insumo (a implementar)");
-}
-
-function modificarInsumo() {
-    alert("Función para modificar un insumo (a implementar)");
-}
-
-function eliminarInsumo() {
-    alert("Función para eliminar un insumo (a implementar)");
-}

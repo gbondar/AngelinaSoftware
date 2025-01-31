@@ -7,21 +7,56 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-texture professional-font">
-    <button onclick="fetchInsumos()">Insumos</button>
-    
-    <!-- Modal -->
+    <button id="btnInsumos">Insumos</button>
+
+    <!-- Modal principal -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="insumos-container"></div>
+            <span class="close-button" id="closeModal" onclick="closeModal()">&times;</span>
+            <h2>Lista de Insumos</h2>
+            <table class="insumos-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Precio Unitario</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
             <div class="modal-buttons">
-                <button onclick="agregarInsumo()">Agregar</button>
-                <button onclick="modificarInsumo()">Modificar</button>
-                <button onclick="eliminarInsumo()">Eliminar</button>
+                <button id="btnAgregarInsumo">Agregar Insumo</button>
             </div>
         </div>
     </div>
-    
+
+    <!-- Modal de agregar insumo -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeAddModal" onclick="closeAddModal()">&times;</span>
+            <h2>Agregar Insumo</h2>
+            <form id="addInsumoForm">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" required>
+                
+                <label for="unidad">Unidad de Medida:</label>
+                <input type="text" id="unidad" required>
+                
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" required>
+                
+                <label for="precio">Precio Unitario:</label>
+                <input type="number" id="precio" required>
+
+                <div class="modal-buttons">
+                    <button type="button" id="btnAddInsumo">Aceptar</button>
+                    <button type="button" id="btnCancelInsumo">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="javascript.js"></script>
 </body>
 </html>
