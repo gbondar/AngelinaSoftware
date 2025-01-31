@@ -58,6 +58,32 @@
             </form>
         </div>
     </div>
+ <!-- Modal de Modificar insumo -->
+    <div id="modifModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModifModal" onclick="closeModifModal()">&times;</span>
+            <h2>Modificar Insumo</h2>
+            <form id="modifInsumoForm">
+                <label for="modifNombre">Nombre:</label>
+                <input type="text" id="modifNombre" required>
+                
+                <label for="modifUnidad">Unidad de Medida:</label>
+                <input type="text" id="modifUnidad" required>
+                
+                <label for="modifCantidad">Cantidad:</label>
+                <input type="number" id="modifCantidad" required>
+                
+                <label for="modifPrecio">Precio Unitario:</label>
+                <input type="number" id="modifPrecio" required>
+
+                <div class="modal-buttons">
+                    <button type="button" id="btnmodaceptInsumo">Aceptar</button>
+                    <button type="button" id="btnmodcancelInsumo">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script src="javascript.js"></script>
 </body>
