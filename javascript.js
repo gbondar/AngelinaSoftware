@@ -65,15 +65,32 @@ document.addEventListener("DOMContentLoaded", () => {
         insumosContainer.innerHTML = ""; 
         data.forEach(insumo => {
             const row = document.createElement("tr");
+    
             row.innerHTML = `
                 <td>${insumo.nombre}</td>
                 <td>${insumo.cantidad}</td>
                 <td>${insumo.unidad_medida}</td>
                 <td>$${insumo.precio_unitario}</td>
             `;
+    
+            // Evento para seleccionar una fila
+            row.addEventListener("click", () => {
+                document.querySelectorAll("#tableBody tr").forEach(tr => tr.classList.remove("selected"));
+                row.classList.add("selected");
+            
+                // Guarda el insumo seleccionado en una variable global
+                window.selectedInsumo = {
+                    nombre: insumo.nombre,
+                    cantidad: insumo.cantidad,
+                    unidad_medida: insumo.unidad_medida,
+                    precio_unitario: insumo.precio_unitario
+                };
+            });
+    
             insumosContainer.appendChild(row);
         });
     }
+    
 
     // Funciones para mostrar o ocultar los modals, no tiene otra funcion que eso
     function openModal() {
@@ -92,10 +109,60 @@ document.addEventListener("DOMContentLoaded", () => {
         addModal.style.display = "none";
     }
 
-    function openModifModal()  {
-        modifModal.style.display = "flex";
+    function openModifModal() {
+        fetch("http://localhost:5000/api/insumos")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById("modifNombre");
+                select.innerHTML = '<option value="">Selecciona un insumo</option>'; // Resetear opciones
+    
+                data.forEach(insumo => {
+                    const option = document.createElement("option");
+                    option.value = insumo.nombre;
+                    option.textContent = insumo.nombre;
+    
+                    // Si el insumo seleccionado es el mismo, se preselecciona
+                    if (window.selectedInsumo && window.selectedInsumo.nombre === insumo.nombre) {
+                        option.selected = true;
+                    }
+    
+                    select.appendChild(option);
+                });
+    
+                // Función para actualizar los campos al cambiar el select
+                function updateFields(selectedName) {
+                    const selectedInsumo = data.find(insumo => insumo.nombre === selectedName);
+                    if (selectedInsumo) {
+                        document.getElementById("modifUnidad").value = selectedInsumo.unidad_medida;
+                        document.getElementById("modifCantidad").value = selectedInsumo.cantidad;
+                        document.getElementById("modifPrecio").value = selectedInsumo.precio_unitario;
+                    } else {
+                        document.getElementById("modifUnidad").value = "";
+                        document.getElementById("modifCantidad").value = "";
+                        document.getElementById("modifPrecio").value = "";
+                    }
+                }
+    
+                // Si ya había un insumo seleccionado, actualizar los campos al abrir el modal
+                if (window.selectedInsumo) {
+                    updateFields(window.selectedInsumo.nombre);
+                }
+    
+                // Escuchar cambios en el select para actualizar los campos dinámicamente
+                select.addEventListener("change", (event) => {
+                    updateFields(event.target.value);
+                });
+    
+                modifModal.style.display = "flex";
+            })
+            .catch(error => {
+                alert("Error al cargar los insumos para modificar.");
+                console.error(error);
+            });
     }
-
+    
+    
+    
     function closeModifModal() {
         modifModal.style.display = "none";
     }
@@ -107,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function addInsumo(event) {
         event.preventDefault(); 
 
-        const nombre = document.getElementById("nombre").value.trim();
+        const nombre = document.getElementById("nombre").value;
         const unidad = document.getElementById("unidad").value.trim();
         const cantidad = document.getElementById("cantidad").value.trim();
         const precio = document.getElementById("precio").value.trim();

@@ -126,6 +126,26 @@ input {
     background-color: #2980b9;
 }
 
+.selected {
+    background-color: rgba(0, 123, 255, 0.2); /* Azul claro */
+    font-weight: bold;
+}
+
+select {
+    width: 100%; /* Que ocupe todo el ancho del contenedor */
+    padding: 8px; /* Mismo padding que los input */
+    font-size: 16px; /* Mismo tamaño de fuente */
+    border: 1px solid #ccc; /* Borde similar */
+    border-radius: 5px; /* Esquinas redondeadas */
+    background-color: white; /* Fondo blanco */
+    appearance: none; /* Eliminar estilos predeterminados del navegador */
+}
+
+select:focus {
+    border-color: #007bff; /* Color al hacer clic */
+    outline: none; /* Evitar el borde azul */
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .modal-content {
