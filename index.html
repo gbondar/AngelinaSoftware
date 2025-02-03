@@ -28,6 +28,8 @@
             <div class="modal-buttons">
                 <button id="btnAgregarInsumo">Agregar Insumo</button>
                 <button id="btnModifInsumo">Modificar Insumo</button>
+                <button id="btnDelInsumo">Eliminar Insumo</button>
+
 
             </div>
         </div>
@@ -85,6 +87,18 @@
             </form>
         </div>
     </div>
+<!-- Modal de Eliminar insumo -->
+<div id="elimModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="closeElimModal" onclick="closeElimModal()">&times;</span>
+        <h2>Eliminar Insumo</h2>
+        <p id="elimMessage"></p> <!-- Texto dinámico aquí -->
+        <div class="modal-buttons">
+            <button type="button" id="btneliaceptInsumo">Aceptar</button>
+            <button type="button" id="btnelicancelInsumo">Cancelar</button>
+        </div>
+    </div>
+</div>
 
 
     <script src="javascript.js"></script>

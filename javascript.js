@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = "none";
     addModal.style.display = "none";
     modifModal.style.display = "none";
+    elimModal.style.display = "none";
     
 
 
@@ -32,10 +33,21 @@ document.addEventListener("DOMContentLoaded", () => {
      //click cancelar agregar insumo
      document.getElementById("btnmodcancelInsumo").addEventListener("click", closeModifModal);
 
+     // click de abrir eliminar insumo
+     document.getElementById("btnDelInsumo").addEventListener("click", openElimModal);
+    // click de aceptar-eliminar insumo
+    document.getElementById("btneliaceptInsumo").addEventListener("click", Eliminsumo);
+
+    // click de cancelar-eliminar insumo
+    document.getElementById("btnelicancelInsumo").addEventListener("click", closeElimModal);
+
+  
+
     // Agregar eventos a las cruces de los modales
     document.getElementById("closeModal").addEventListener("click", closeModal);
     document.getElementById("closeAddModal").addEventListener("click", closeAddModal);
     document.getElementById("closeModifModal").addEventListener("click", closeModifModal);
+    document.getElementById("closeElimModal").addEventListener("click", closeElimModal);
 
 
     //funciones de lectura en la bbdd 
@@ -167,6 +179,21 @@ document.addEventListener("DOMContentLoaded", () => {
         modifModal.style.display = "none";
     }
 
+    function openElimModal() {
+        if (!window.selectedInsumo) {
+            alert("Selecciona un insumo para eliminar.");
+            return;
+        }
+    
+        const message = document.getElementById("elimMessage");
+        message.textContent = `¿Estás seguro que deseas eliminar "${window.selectedInsumo.nombre}"?`;
+    
+        document.getElementById("elimModal").style.display = "flex";
+    }
+    
+    function closeElimModal() {
+        document.getElementById("elimModal").style.display = "none";
+    }
 
 
     //Aqui empiezan las funciones de eventos que modifican la bbdd
@@ -252,6 +279,39 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(error.message);
         });
     }
+
+    function Eliminsumo() {
+        if (!window.selectedInsumo) {
+            alert("No hay insumo seleccionado para eliminar.");
+            return;
+        }
+
+        fetch("http://localhost:5000/api/insumos", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nombre: window.selectedInsumo.nombre
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al eliminar el insumo");
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            closeElimModal();
+            fetchInsumos(); // Recargar la tabla
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+
+
     
     //Cierra al tocar afuera de los modals
     window.onclick = function (event) {
@@ -262,3 +322,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 });
+

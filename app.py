@@ -5,6 +5,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+#Conecta la BBDD por primera vez
 def get_db_connection():
     db_path = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\sistema_ventas.db'
     try:
@@ -16,6 +17,7 @@ def get_db_connection():
         print("Error al conectar a la base de datos:", e)
         return None
 
+#Lee insumos
 @app.route('/api/insumos', methods=['GET'])
 def get_insumos():
     conn = get_db_connection()
@@ -36,6 +38,8 @@ def get_insumos():
         print("Error en la consulta a la base de datos:", e)
         return jsonify({"error": "Error al obtener los datos de la base de datos"}), 500
 
+
+#Agrega en tabla insumos
 @app.route('/api/insumos', methods=['POST'])
 def agregar_insumo():
     data = request.json
@@ -56,6 +60,7 @@ def agregar_insumo():
         print("Error al agregar insumo:", e)
         return jsonify({"error": "Error al agregar insumo"}), 500
 
+#Elimina de tabla insumos
 @app.route('/api/insumos', methods=['DELETE'])
 def eliminar_insumo():
     data = request.json
@@ -73,6 +78,7 @@ def eliminar_insumo():
         print("Error al eliminar insumo:", e)
         return jsonify({"error": "Error al eliminar insumo"}), 500
 
+#Modifica insumos
 @app.route('/api/insumos', methods=['PUT'])
 def modificar_insumo():
     data = request.json
