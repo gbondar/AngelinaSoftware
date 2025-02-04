@@ -146,10 +146,6 @@ select:focus {
     outline: none; /* Evitar el borde azul */
 }
 
-#elimModalRecetas {
-    display: none !important; /* Fuerza a que inicie oculto */
-}
-
 .recetas-table {
     width: 100%;
     border-collapse: collapse;

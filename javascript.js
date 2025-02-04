@@ -80,21 +80,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Click para cancelar la modificación de la receta
     document.getElementById("btnModifRecetaCancelar").addEventListener("click", closeModifModalRecetas);
 
-
-    /*
     //click eliminar receta
-    document.getElementById("btnDelReceta").addEventListener("click", );
-
-
+    document.getElementById("btnDelReceta").addEventListener("click", openElimModalRecetas);
     //click aceptar eliminar receta
-    document.getElementById("btnEliAceptReceta").addEventListener("click", );
-
-
+    document.getElementById("btnEliAceptReceta").addEventListener("click", deleteReceta);
     //click cancelar eliminar receta
-    document.getElementById("btnEliCancelReceta").addEventListener("click", );
+    document.getElementById("btnEliCancelReceta").addEventListener("click", closeElimModalRecetas);
 
-  */
-  
 
     // Agregar eventos a las cruces de los modales
     document.getElementById("closeModal").addEventListener("click", closeModal);
@@ -107,6 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("closeModifModalRecetas").addEventListener("click", closeModifModalRecetas);
     document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
+
+    
 
     
     
@@ -161,6 +155,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeAddModalRecetas() {
         document.getElementById("addModalRecetas").style.display = "none";
     }
+
+    function closeElimModalRecetas() {
+        document.getElementById("elimModalRecetas").style.display = "none";
+    }
+    
+    
     
 
     //Esta funcion le da formato a la tabla que se muestra al abrir insumos
@@ -336,6 +336,19 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeElimModal() {
         document.getElementById("elimModal").style.display = "none";
     }
+
+    function openElimModalRecetas() {
+        if (!window.selectedReceta) {
+            alert("Selecciona una receta para eliminar.");
+            return;
+        }
+    
+        document.getElementById("elimMessageReceta").textContent = 
+            `¿Está seguro de eliminar la receta: ${window.selectedReceta.nombre}?`;
+        
+        document.getElementById("elimModalRecetas").style.display = "flex";
+    }
+    
 
 
     //Aqui empiezan las funciones de eventos que modifican la bbdd
@@ -572,6 +585,32 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(error.message);
         });
     }
+
+    function deleteReceta() {
+        if (!window.selectedReceta) {
+            alert("No hay receta seleccionada para eliminar.");
+            return;
+        }
+    
+        fetch(`http://localhost:5000/api/recetas/${window.selectedReceta.id}`, {
+            method: "DELETE"
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al eliminar la receta.");
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert(`Receta "${window.selectedReceta.nombre}" eliminada con éxito.`);
+            closeElimModalRecetas();
+            fetchRecetas();
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+    
     
     
     
