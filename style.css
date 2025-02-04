@@ -17,14 +17,6 @@
     left: 10;
 }
 
-.main-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh; /* Ocupar toda la pantalla */
-    margin-top: 0px; /* Evita que quede tapado por el header */
-}
 
 
 /* Estilos generales */
@@ -36,6 +28,14 @@ body {
     margin: 0; /* Asegura que no haya margen extra */
 }
 
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top:80px; /* Evita que quede tapado por el header */
+}
+
 .main-button {
     width: 200px; /* Más grande */
     height: 80px; /* Cuadrado */
@@ -44,6 +44,12 @@ body {
     margin: 20px auto; /* Centrado en la página */
     text-align: center;
     font-family: 'Roboto', sans-serif !important;
+}
+
+.main-button:hover {
+    background-color: #341d4f; /* Color más oscuro en hover */
+    transform: scale(1.05); /* Efecto sutil de agrandado */
+    border: 2px solid white; /* Resalta el borde en hover */
 }
 
 
@@ -210,9 +216,18 @@ select:focus {
 }
 
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive para pantallas menores a 820px */
+@media (max-width: 820px) {
     .modal-content {
-        width: 90%;
+        width: 60%;
+    }
+    .button {
+        width: 150px; /* Reduce el ancho */
+        font-size: 12px; /* Ajusta el tamaño del texto */
+        height: 50px; /* Ajusta la altura */
+    }
+    
+    .buttons-container {
+        gap: 8px; /* Reduce el espacio entre los botones */
     }
 }
