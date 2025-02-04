@@ -56,29 +56,32 @@ document.addEventListener("DOMContentLoaded", () => {
     //click a recetas
     document.getElementById("btnRecetas").addEventListener("click", fetchRecetas);
 
-    /* 
+    // Click para abrir el modal de agregar receta
+    document.getElementById("btnAgregarReceta").addEventListener("click", function() {
+        document.getElementById("addModalRecetas").style.display = "flex";
+    });
+
+     
     //click agregar receta
-    document.getElementById("btnAgregarReceta").addEventListener("click", );
+    document.getElementById("btnAddReceta").addEventListener("click", addReceta);
 
 
-    //click aceptar agregar receta
-    document.getElementById("btnAddReceta").addEventListener("click", );
-
+    
     //click cancelar agregar receta
-    document.getElementById("btnCancelReceta").addEventListener("click", );
+    document.getElementById("btnCancelReceta").addEventListener("click", closeAddModalRecetas);
 
 
-    //click modificar receta
-    document.getElementById("btnModifReceta").addEventListener("click", );
+    // Click para abrir el modal de modificar receta
+    document.getElementById("btnModifReceta").addEventListener("click", openModifModalRecetas);
+
+    // Click para aceptar la modificación de la receta
+    document.getElementById("btnModifRecetaAceptar").addEventListener("click", modifyReceta);
+
+    // Click para cancelar la modificación de la receta
+    document.getElementById("btnModifRecetaCancelar").addEventListener("click", closeModifModalRecetas);
 
 
-    //click aceptar modificar receta
-    document.getElementById("btnModifRecetaAceptar").addEventListener("click", );
-
-    //click cancelar modificar receta
-    document.getElementById("btnModifRecetaCancelar").addEventListener("click", );
-
-
+    /*
     //click eliminar receta
     document.getElementById("btnDelReceta").addEventListener("click", );
 
@@ -155,6 +158,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("modalRecetas").style.display = "block";
     }
 
+    function closeAddModalRecetas() {
+        document.getElementById("addModalRecetas").style.display = "none";
+    }
+    
+
     //Esta funcion le da formato a la tabla que se muestra al abrir insumos
 
     function renderTable(data) {
@@ -197,9 +205,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${receta.nombre}</td>
                 <td>${receta.precio_venta}</td>
             `;
+    
+            // Evento para seleccionar una fila
+            row.addEventListener("click", () => {
+                document.querySelectorAll("#tableBodyRecetas tr").forEach(tr => tr.classList.remove("selected"));
+                row.classList.add("selected");
+    
+                // Guarda la receta seleccionada en una variable global
+                window.selectedReceta = {
+                    id: receta.id,
+                    nombre: receta.nombre,
+                    precio_venta: receta.precio_venta
+                };
+            });
+    
             recetasContainer.appendChild(row);
         });
     }
+    
     
 
     // Funciones para mostrar o ocultar los modals, no tiene otra funcion que eso
@@ -288,6 +311,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeModifModal() {
         modifModal.style.display = "none";
     }
+
+    function closeModifRecModal() {
+        modifModal.style.display = "none";
+    }
+
+    function closeModifModalRecetas() {
+        document.getElementById("modifModalRecetas").style.display = "none";
+    }
+    
 
     function openElimModal() {
         if (!window.selectedInsumo) {
@@ -421,7 +453,127 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    //COMIENZA MODULO RECETA
 
+    function addReceta(event) {
+        event.preventDefault();
+    
+        const nombre = document.getElementById("nombreReceta").value.trim();
+        const precio = document.getElementById("precioReceta").value.trim();
+    
+        if (!nombre || !precio) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+    
+        fetch("http://localhost:5000/api/recetas", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nombre,
+                precio_venta: parseFloat(precio),
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al agregar la receta");
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert("Receta agregada con éxito");
+            closeAddModalRecetas();
+            fetchRecetas(); 
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+    
+    function openModifModalRecetas() {
+        if (!window.selectedReceta) {
+            alert("Selecciona una receta para modificar.");
+            return;
+        }
+    
+        fetch("http://localhost:5000/api/recetas")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById("modifNombreReceta");
+                select.innerHTML = '<option value="">Selecciona una receta</option>'; // Resetear opciones
+    
+                data.forEach(receta => {
+                    const option = document.createElement("option");
+                    option.value = receta.id;
+                    option.textContent = receta.nombre;
+    
+                    if (window.selectedReceta && window.selectedReceta.id === receta.id) {
+                        option.selected = true;
+                    }
+    
+                    select.appendChild(option);
+                });
+    
+                // Precargar los valores en los campos
+                document.getElementById("modifPrecioReceta").value = window.selectedReceta.precio_venta;
+    
+                // Escuchar cambios en el select para actualizar el campo de precio dinámicamente
+                select.addEventListener("change", (event) => {
+                    const selectedId = parseInt(event.target.value);
+                    const selectedReceta = data.find(receta => receta.id === selectedId);
+                    if (selectedReceta) {
+                        document.getElementById("modifPrecioReceta").value = selectedReceta.precio_venta;
+                    }
+                });
+    
+                document.getElementById("modifModalRecetas").style.display = "flex";
+            })
+            .catch(error => {
+                alert("Error al cargar las recetas para modificar.");
+                console.error(error);
+            });
+    }
+    
+    function modifyReceta(event) {
+        event.preventDefault();
+    
+        const recetaId = document.getElementById("modifNombreReceta").value;
+        const precio = document.getElementById("modifPrecioReceta").value.trim();
+    
+        if (!recetaId || !precio) {
+            alert("Por favor, selecciona una receta y completa todos los campos.");
+            return;
+        }
+    
+        fetch(`http://localhost:5000/api/recetas/${recetaId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nombre: document.getElementById("modifNombreReceta").selectedOptions[0].text,
+                precio_venta: parseFloat(precio),
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al modificar la receta");
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert("Receta modificada con éxito");
+            closeModifModalRecetas();
+            fetchRecetas(); // Recargar la tabla
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+    
+    
     
     //Cierra al tocar afuera de los modals
     window.onclick = function (event) {
