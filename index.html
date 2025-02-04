@@ -4,17 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insumos</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="style.css">
+    </head>
 </head>
 <body class="bg-texture professional-font">
-    <button id="btnInsumos">Insumos</button>
-    <button id="btnRecetas">Recetas</button>
+    
+    <header class="main-header">
+        <img src="https://i.postimg.cc/dQgzwyvt/Angelina-Violeta.png" alt="Logo de la marca" class="logo">
+    </header>
+
+    <div class="main-container">
+        <button id="btnInsumos" class="main-button">Insumos</button>
+        <button id="btnRecetas" class="main-button">Recetas</button>
+    </div>
 
     <!-- Modal principal -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeModal" onclick="closeModal()">&times;</span>
-            <h2>Lista de Insumos</h2>
+            <h2>Insumos</h2>
             <table class="insumos-table">
                 <thead>
                     <tr>
