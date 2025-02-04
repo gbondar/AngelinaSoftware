@@ -9,6 +9,16 @@ document.addEventListener("DOMContentLoaded", () => {
     addModal.style.display = "none";
     modifModal.style.display = "none";
     elimModal.style.display = "none";
+
+   
+    modalRecetas.style.display = "none";
+    addModalRecetas.style.display = "none";
+    modifModalRecetas.style.display = "none";
+     /*
+    elimModalRecetas.style.display = "none";
+    
+    
+    */
     
 
 
@@ -41,6 +51,46 @@ document.addEventListener("DOMContentLoaded", () => {
     // click de cancelar-eliminar insumo
     document.getElementById("btnelicancelInsumo").addEventListener("click", closeElimModal);
 
+
+    
+    //click a recetas
+    document.getElementById("btnRecetas").addEventListener("click", fetchRecetas);
+
+    /* 
+    //click agregar receta
+    document.getElementById("btnAgregarReceta").addEventListener("click", );
+
+
+    //click aceptar agregar receta
+    document.getElementById("btnAddReceta").addEventListener("click", );
+
+    //click cancelar agregar receta
+    document.getElementById("btnCancelReceta").addEventListener("click", );
+
+
+    //click modificar receta
+    document.getElementById("btnModifReceta").addEventListener("click", );
+
+
+    //click aceptar modificar receta
+    document.getElementById("btnModifRecetaAceptar").addEventListener("click", );
+
+    //click cancelar modificar receta
+    document.getElementById("btnModifRecetaCancelar").addEventListener("click", );
+
+
+    //click eliminar receta
+    document.getElementById("btnDelReceta").addEventListener("click", );
+
+
+    //click aceptar eliminar receta
+    document.getElementById("btnEliAceptReceta").addEventListener("click", );
+
+
+    //click cancelar eliminar receta
+    document.getElementById("btnEliCancelReceta").addEventListener("click", );
+
+  */
   
 
     // Agregar eventos a las cruces de los modales
@@ -48,6 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("closeAddModal").addEventListener("click", closeAddModal);
     document.getElementById("closeModifModal").addEventListener("click", closeModifModal);
     document.getElementById("closeElimModal").addEventListener("click", closeElimModal);
+    document.getElementById("closeModalRecetas").addEventListener("click", closeModalRecetas);
+
+    document.getElementById("closeAddModalRecetas").addEventListener("click", closeAddModalRecetas);
+
+    document.getElementById("closeModifModalRecetas").addEventListener("click", closeModifModalRecetas);
+    document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
+
+    
+    
+    
 
 
     //funciones de lectura en la bbdd 
@@ -69,7 +129,31 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
+    function fetchRecetas() {
+        // Cerrar el modal de insumos si está abierto
+        document.getElementById("modal").style.display = "none";
+    
+        fetch("http://localhost:5000/api/recetas")
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Recetas obtenidas:", data);
+                renderRecetasTable(data); // Asegúrate de tener una función específica para recetas
+                openModalRecetas(); // Abre el modal correcto
+            })
+            .catch(error => {
+                console.error("Error en fetchRecetas:", error);
+                alert(error.message);
+            });
+    }
 
+    function openModalRecetas() {
+        document.getElementById("modalRecetas").style.display = "block";
+    }
 
     //Esta funcion le da formato a la tabla que se muestra al abrir insumos
 
@@ -102,6 +186,20 @@ document.addEventListener("DOMContentLoaded", () => {
             insumosContainer.appendChild(row);
         });
     }
+
+    function renderRecetasTable(data) {
+        const recetasContainer = document.getElementById("tableBodyRecetas");
+        recetasContainer.innerHTML = ""; // Limpiar antes de agregar
+    
+        data.forEach(receta => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${receta.nombre}</td>
+                <td>${receta.precio_venta}</td>
+            `;
+            recetasContainer.appendChild(row);
+        });
+    }
     
 
     // Funciones para mostrar o ocultar los modals, no tiene otra funcion que eso
@@ -119,6 +217,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeAddModal() {
         addModal.style.display = "none";
+    }
+
+    function closeModalRecetas() {
+        modalRecetas.style.display = "none";
+    }
+
+    function closeElimModalRecetas() {
+        elimModalRecetas.style.display = "none";
+    }
+
+    function openModalRecetas() {
+        document.getElementById("modalRecetas").style.display = "flex";
     }
 
     function openModifModal() {

@@ -99,6 +99,79 @@ def modificar_insumo():
     except sqlite3.Error as e:
         print("Error al modificar insumo:", e)
         return jsonify({"error": "Error al modificar insumo"}), 500
+    
+# Leer recetas
+@app.route('/api/recetas', methods=['GET'])
+def get_recetas():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, nombre, precio_venta FROM recetas")
+        recetas = cursor.fetchall()
+        conn.close()
+        return jsonify([dict(row) for row in recetas])
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al obtener recetas"}), 500
+
+# Agregar receta
+@app.route('/api/recetas', methods=['POST'])
+def agregar_receta():
+    data = request.json
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO recetas (nombre, precio_venta)
+            VALUES (?, ?)
+        """, (data['nombre'], data['precio_venta']))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Receta agregada correctamente"}), 201
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al agregar receta"}), 500
+
+# Modificar receta (nombre o precio)
+@app.route('/api/recetas/<int:receta_id>', methods=['PUT'])
+def modificar_receta(receta_id):
+    data = request.json
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE recetas
+            SET nombre = ?, precio_venta = ?
+            WHERE id = ?
+        """, (data['nombre'], data['precio_venta'], receta_id))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Receta modificada correctamente"}), 200
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al modificar receta"}), 500
+
+# Eliminar receta
+@app.route('/api/recetas/<int:receta_id>', methods=['DELETE'])
+def eliminar_receta(receta_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM recetas WHERE id = ?", (receta_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Receta eliminada correctamente"}), 200
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al eliminar receta"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

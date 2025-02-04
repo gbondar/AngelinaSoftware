@@ -8,6 +8,7 @@
 </head>
 <body class="bg-texture professional-font">
     <button id="btnInsumos">Insumos</button>
+    <button id="btnRecetas">Recetas</button>
 
     <!-- Modal principal -->
     <div id="modal" class="modal">
@@ -99,6 +100,86 @@
         </div>
     </div>
 </div>
+
+    <!-- Modal principal Recetas -->
+    <div id="modalRecetas" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalRecetas" onclick="closeModalRecetas()">&times;</span>
+            <h2>Lista de Recetas</h2>
+            <table class="recetas-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyRecetas"></tbody>
+            </table>
+            <div class="modal-buttons">
+                <button id="btnAgregarReceta">Agregar Receta</button>
+                <button id="btnModifReceta">Modificar Receta</button>
+                <button id="btnDelReceta">Eliminar Receta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de agregar receta -->
+    <div id="addModalRecetas" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeAddModalRecetas" onclick="closeAddModalRecetas()">&times;</span>
+            <h2>Agregar Receta</h2>
+            <form id="addRecetaForm">
+                <label for="nombreReceta">Nombre:</label>
+                <input type="text" id="nombreReceta" required>
+                
+                <label for="precioReceta">Precio:</label>
+                <input type="number" id="precioReceta" required>
+
+                <div class="modal-buttons">
+                    <button type="button" id="btnAddReceta">Aceptar</button>
+                    <button type="button" id="btnCancelReceta">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de modificar receta -->
+    <div id="modifModalRecetas" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModifModalRecetas" onclick="closeModifModalRecetas()">&times;</span>
+            <h2>Modificar Receta</h2>
+            <form id="modifRecetaForm">
+                <label for="modifNombreReceta">Nombre:</label>
+                <select id="modifNombreReceta" required>
+                    <option value="">Selecciona una receta</option>
+                </select>
+                
+                <label for="modifPrecioReceta">Precio:</label>
+                <input type="number" id="modifPrecioReceta" required>
+
+                <div class="modal-buttons">
+                    <button type="button" id="btnModifRecetaAceptar">Aceptar</button>
+                    <button type="button" id="btnModifRecetaCancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!--  
+    Modal de eliminar receta 
+    <div id="elimModalRecetas" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeElimModalRecetas" onclick="closeElimModalRecetas()">&times;</span>
+            <h2>Eliminar Receta</h2>
+            <p id="elimMessageReceta"></p> Texto dinámico aquí
+            <div class="modal-buttons">
+                <button type="button" id="btnEliAceptReceta">Aceptar</button>
+                <button type="button" id="btnEliCancelReceta">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    -->
 
 
     <script src="javascript.js"></script>
