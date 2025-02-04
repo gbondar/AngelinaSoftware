@@ -611,6 +611,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            // Detecta qué modal está activo
+            if (addModal.style.display === "flex") {
+                document.getElementById("btnAddInsumo").click(); // Llama al botón de agregar insumo
+            } else if (modifModal.style.display === "flex") {
+                document.getElementById("btnmodaceptInsumo").click(); // Llama al botón de modificar insumo
+            } else if (elimModal.style.display === "flex") {
+                document.getElementById("btneliaceptInsumo").click(); // Llama al botón de eliminar insumo
+            } else if (modalRecetas.style.display === "flex") {
+                document.getElementById("btnAddReceta").click(); // Llama al botón de agregar receta
+            } else if (addModalRecetas.style.display === "flex") {
+                document.getElementById("btnAddReceta").click(); // Llama al botón de aceptar receta
+            } else if (modifModalRecetas.style.display === "flex") {
+                document.getElementById("btnModifRecetaAceptar").click(); // Llama al botón de modificar receta
+            } else if (elimModalRecetas.style.display === "flex") {
+                document.getElementById("btnEliAceptReceta").click(); // Llama al botón de eliminar receta
+            }
+        }
+    });
+    
     
     
     
