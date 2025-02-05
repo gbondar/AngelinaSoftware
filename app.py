@@ -116,6 +116,24 @@ def get_recetas():
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener recetas"}), 500
 
+#LEER DATOS
+
+@app.route('/api/insumos/<nombre>', methods=['GET'])
+def get_insumo(nombre):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Normalizar el nombre eliminando espacios extra y convirtiéndolo a minúsculas
+    cursor.execute("SELECT nombre, cantidad, unidad_medida, precio_unitario FROM insumos WHERE LOWER(TRIM(nombre)) = LOWER(TRIM(?))", (nombre,))
+    
+    insumo = cursor.fetchone()
+    conn.close()
+
+    if insumo:
+        return jsonify(dict(insumo))
+    else:
+        return jsonify({"error": "Insumo no encontrado"}), 404
+    
 # Agregar receta
 @app.route('/api/recetas', methods=['POST'])
 def agregar_receta():
@@ -175,6 +193,7 @@ def eliminar_receta(receta_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 #AGREGA STOCK Y PONDERA PRECIOS INGREDIENTES
 

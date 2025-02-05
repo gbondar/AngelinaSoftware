@@ -53,23 +53,30 @@
             <span class="close-button" id="closeAddModal" onclick="closeAddModal()">&times;</span>
             <h2>Agregar Insumo</h2>
             <form id="addInsumoForm">
-                <label for="nombre">Insumo:</label>
-                <input type="text" id="nombre" required>
-                
-                <label for="unidad">Unidad de Medida:</label>
-                <input type="text" id="unidad" required>
-                
+                <label for="insumoSelect">Insumo:</label>
+                <select id="insumoSelect" required>
+                    <option value="">Selecciona un insumo</option>
+                </select>
+            
+                <div id="nuevoInsumoFields" style="display: none;">
+                    <label for="nombreNuevo">Nombre:</label>
+                    <input type="text" id="nombreNuevo">
+                    
+                    <label for="unidadNuevo">Unidad de Medida:</label>
+                    <input type="text" id="unidadNuevo">
+                </div>
+            
                 <label for="cantidad">Cantidad:</label>
                 <input type="number" id="cantidad" required>
                 
                 <label for="precio">Precio Unitario:</label>
                 <input type="number" id="precio" required>
-
+            
                 <div class="modal-buttons">
                     <button type="button" id="btnAddInsumo">Aceptar</button>
                     <button type="button" id="btnCancelInsumo">Cancelar</button>
                 </div>
-            </form>
+            </form>            
         </div>
     </div>
  <!-- Modal de Modificar insumo -->

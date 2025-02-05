@@ -28,6 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     //click a agregar insumo
     document.getElementById("btnAgregarInsumo").addEventListener("click", openAddModal);
 
+    //Click a agregar insumo existente
+    document.getElementById("insumoSelect").addEventListener("change", handleInsumoSelection);
+
     //click aceptar agregar insumo
     document.getElementById("btnAddInsumo").addEventListener("click", addInsumo);
 
@@ -235,8 +238,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function openAddModal() {
-        addModal.style.display = "flex";
+        fetch("http://localhost:5000/api/insumos")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById("insumoSelect");
+                select.innerHTML = '<option value="">Selecciona un insumo</option>';
+    
+                data.forEach(insumo => {
+                    const option = document.createElement("option");
+                    option.value = insumo.nombre;
+                    option.textContent = insumo.nombre;
+                    select.appendChild(option);
+                });
+    
+                // Agregar opción "Agregar nuevo..."
+                const newOption = document.createElement("option");
+                newOption.value = "nuevo";
+                newOption.textContent = "Agregar nuevo...";
+                select.appendChild(newOption);
+    
+                document.getElementById("nuevoInsumoFields").style.display = "none";
+                document.getElementById("cantidad").value = "";
+                document.getElementById("precio").value = "";
+    
+                document.getElementById("addModal").style.display = "flex";
+            })
+            .catch(error => {
+                alert("Error al cargar los insumos");
+                console.error(error);
+            });
     }
+
+    function handleInsumoSelection() {
+        const select = document.getElementById("insumoSelect");
+        const nuevoFields = document.getElementById("nuevoInsumoFields");
+    
+        if (select.value === "nuevo") {
+            nuevoFields.style.display = "block";
+        } else {
+            nuevoFields.style.display = "none";
+        }
+    }
+    
 
     function closeAddModal() {
         addModal.style.display = "none";
@@ -354,47 +397,98 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Aqui empiezan las funciones de eventos que modifican la bbdd
 
-    function addInsumo(event) {
-        event.preventDefault(); 
-
-        const nombre = document.getElementById("nombre").value;
-        const unidad = document.getElementById("unidad").value.trim();
-        const cantidad = document.getElementById("cantidad").value.trim();
-        const precio = document.getElementById("precio").value.trim();
-
-        if (!nombre || !unidad || !cantidad || !precio) {
-            alert("Por favor, completa todos los campos.");
+    function addInsumo() {
+        const select = document.getElementById("insumoSelect");
+        const insumoSeleccionado = select.value;
+        const cantidadNueva = parseFloat(document.getElementById("cantidad").value);
+        const precioNuevo = parseFloat(document.getElementById("precio").value);
+    
+        if (!cantidadNueva || !precioNuevo || cantidadNueva <= 0 || precioNuevo <= 0) {
+            alert("Por favor, ingrese valores válidos.");
             return;
         }
-
-        fetch("http://localhost:5000/api/insumos", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                nombre,
-                unidad_medida: unidad,
-                cantidad: parseFloat(cantidad),
-                precio_unitario: parseFloat(precio),
-            }),
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error al agregar el insumo");
+    
+        if (insumoSeleccionado === "nuevo") {
+            // Se trata de un insumo completamente nuevo
+            const nombreNuevo = document.getElementById("nombreNuevo").value.trim();
+            const unidadNuevo = document.getElementById("unidadNuevo").value.trim();
+    
+            if (!nombreNuevo || !unidadNuevo) {
+                alert("Por favor, complete todos los campos del nuevo insumo.");
+                return;
             }
-            return response.json();
-        })
-        .then(() => {
-            alert("Insumo agregado con éxito");
-            closeAddModal();
-            fetchInsumos(); 
-        })
-        .catch(error => {
-            alert(error.message);
-        });
+    
+            fetch("http://localhost:5000/api/insumos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    nombre: nombreNuevo,
+                    unidad_medida: unidadNuevo,
+                    cantidad: cantidadNueva,
+                    precio_unitario: precioNuevo
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Insumo agregado correctamente.");
+                fetchInsumos(); // Recargar la tabla
+                closeAddModal();
+            })
+            .catch(error => {
+                console.error("Error al agregar insumo:", error);
+                alert("Error al agregar insumo.");
+            });
+    
+        } else {
+            // Se trata de un insumo existente, se debe actualizar
+            fetch(`http://localhost:5000/api/insumos/${encodeURIComponent(insumoSeleccionado)}`)
+            .then(response => response.json())
+            .then(insumoExistente => {
+                if (!insumoExistente) {
+                    alert("Error: Insumo no encontrado.");
+                    return;
+                }
+            
+                // Obtener la unidad de medida del insumo existente
+                const unidadMedida = insumoExistente.unidad_medida;
+            
+                // Cálculo del promedio ponderado para el nuevo precio unitario
+                const cantidadActual = parseFloat(insumoExistente.cantidad);
+                const precioActual = parseFloat(insumoExistente.precio_unitario);
+            
+                const nuevaCantidadTotal = cantidadActual + cantidadNueva;
+                const nuevoPrecioUnitario = ((cantidadActual * precioActual) + (cantidadNueva * precioNuevo)) / nuevaCantidadTotal;
+            
+                // Enviar actualización al backend
+                fetch(`http://localhost:5000/api/insumos`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        nombre: insumoSeleccionado,
+                        cantidad: nuevaCantidadTotal,
+                        unidad_medida: unidadMedida, // Mantiene la unidad de medida existente
+                        precio_unitario: nuevoPrecioUnitario
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Insumo actualizado correctamente.");
+                    fetchInsumos(); // Recargar la tabla
+                    closeAddModal();
+                })
+                .catch(error => {
+                    console.error("Error al actualizar insumo:", error);
+                    alert("Error al actualizar insumo.");
+                });
+            })
+            .catch(error => {
+                console.error("Error al obtener insumo:", error);
+                alert("Error al obtener información del insumo.");
+            });
+            
+        }
     }
-
+    
     function modifyInsumo(event) {
         event.preventDefault(); 
     
