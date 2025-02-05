@@ -274,12 +274,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const nuevoFields = document.getElementById("nuevoInsumoFields");
     
         if (select.value === "nuevo") {
-            nuevoFields.style.display = "block";
+            nuevoFields.style.display = "flex";  // Asegura que use flexbox como el form
+            nuevoFields.style.flexDirection = "column"; // Mantiene la estructura en columna
+            nuevoFields.style.gap = "15px";  // Ajusta el espacio entre los inputs
         } else {
             nuevoFields.style.display = "none";
         }
     }
-    
 
     function closeAddModal() {
         addModal.style.display = "none";
