@@ -30,66 +30,66 @@ body {
 
 .main-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Mantiene los botones en una sola fila */
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Centra verticalmente en la pantalla */
+    height: 100vh; /* Centra verticalmente */
     gap: 20px;
 }
 
 
 .main-button {
-    width: 300px;
-    height: 500px;
-    background-size: 100% 100%;
+    width: 250px; /* Ancho fijo */
+    height: 400px; /* Alto fijo */
+    background-size: contain; /* Mantiene la proporción de la imagen */
+    background-repeat: no-repeat;
     background-position: center;
+    background-color: transparent; /* Asegura que no haya fondo */
     border: none;
     cursor: pointer;
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     text-decoration: none;
     transition: transform 0.3s ease-in-out;
+    padding-top: 20px; /* Espacio para el texto */
 }
 
 /* Aumenta el tamaño del texto */
 .main-button span {
     font-size: 50px; /* Tamaño grande */
-    color: rgb(213, 207, 121);
+    color: #5A3B81;
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 4px rgb(0, 0, 0);
     position: absolute;
     text-align: center;
 }
 
 /* Texto dentro del botón */
 .button-text {
-    font-size: 50px;
-    color: white;
+    font-size: 28px;
+    color: #5A3B81; /* Texto violeta */
     font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    position: absolute;
     text-align: center;
+    position: absolute;
+    top: -40px; /* Ajusta la posición para que quede sobre la imagen */
     width: 100%;
+    background: none; /* Elimina el fondo violeta */
 }
 
 
 .main-button:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    background-color: transparent 
 }
 
+/* Elimina el fondo violeta de la parte inferior */
 .main-button::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 40px; /* Tamaño grande para la palabra */
-    color: white;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    display: none;
 }
+
 
 .main-button:hover::before {
     content: '';
@@ -98,7 +98,6 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Efecto polarizado */
 }
 
 /* Botón */
@@ -264,20 +263,20 @@ select:focus {
 }
 
 #btnCaja {
-    background-image: url('https://i.postimg.cc/1zgN0GfV/DALL-E-2025-02-05-14-47-38-A-black-and-white-3-D-minimalist-shopping-cart-drawing-with-clean-lines.webp');
+    background-image: url('https://i.postimg.cc/k4h0j3Qm/DALL-E-2025-02-05-16-28-28-A-black-and-white-3-D-minimalist-drawing-of-a-shopping-cart-with-clean-l.webp');
     data-text: 'Ventas';
 }
 
 #btnRecetas {
-    background-image: url('https://i.postimg.cc/y63v6Rjd/DALL-E-2025-02-05-14-47-42-A-black-and-white-3-D-minimalist-illustration-of-a-fork-and-spoon-crosse.webp');
+    background-image: url('https://i.postimg.cc/gcTbKbQn/DALL-E-2025-02-05-16-30-14-A-black-and-white-3-D-minimalist-illustration-of-a-fork-and-spoon-crosse.webp');
 }
 
 #btnInsumos {
-    background-image: url('https://i.postimg.cc/MGYm4bzP/DALL-E-2025-02-05-14-47-44-A-black-and-white-3-D-minimalist-drawing-of-a-pastry-related-utensil-su.webp');
+    background-image: url('https://i.postimg.cc/jSHrR1bH/DALL-E-2025-02-05-16-28-37-A-black-and-white-3-D-minimalist-drawing-of-a-pastry-related-utensil-su.webp');
 }
 
 #btnReportes {
-    background-image: url('https://i.postimg.cc/v8t3kyZ8/DALL-E-2025-02-05-14-47-46-A-black-and-white-3-D-minimalist-illustration-of-a-spreadsheet-or-data-s.webp');
+    background-image: url('https://i.postimg.cc/t7GsZnHx/DALL-E-2025-02-05-16-29-43-A-black-and-white-3-D-minimalist-illustration-of-a-spreadsheet-or-data-s.webp');
 }
 
 
@@ -303,6 +302,6 @@ select:focus {
     }
 
     .main-button span {
-        font-size: 40px; /* Reduce el tamaño del texto en pantallas pequeñas */
+        font-size: 20px; /* Reduce el tamaño del texto en pantallas pequeñas */
     }
 }
