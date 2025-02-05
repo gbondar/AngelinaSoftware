@@ -175,3 +175,54 @@ def eliminar_receta(receta_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+#AGREGA STOCK Y PONDERA PRECIOS INGREDIENTES
+
+@app.route('/api/insumos/actualizar_stock', methods=['PUT'])
+def modificar_insumo_stock():
+    data = request.json
+    nombre = data['nombre']
+    cantidad_nueva = data['cantidad']
+    precio_nuevo = data['precio_unitario']
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+        
+        # Obtener el estado actual del insumo
+        cursor.execute("SELECT cantidad, precio_unitario FROM insumos WHERE nombre = ?", (nombre,))
+        insumo = cursor.fetchone()
+        
+        if insumo is None:
+            return jsonify({"error": "Insumo no encontrado"}), 404
+        
+        cantidad_anterior, precio_anterior = insumo
+
+        # Calcular el nuevo stock y el precio promedio ponderado
+        nueva_cantidad = cantidad_anterior + cantidad_nueva
+        nuevo_precio = ((cantidad_anterior * precio_anterior) + (cantidad_nueva * precio_nuevo)) / nueva_cantidad
+
+        # Actualizar la base de datos
+        cursor.execute("""
+            UPDATE insumos
+            SET cantidad = ?, precio_unitario = ?
+            WHERE nombre = ?
+        """, (nueva_cantidad, nuevo_precio, nombre))
+
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            "message": "Stock actualizado correctamente",
+            "nombre": nombre,
+            "nueva_cantidad": nueva_cantidad,
+            "nuevo_precio": nuevo_precio
+        }), 200
+
+    except sqlite3.Error as e:
+        print("Error al modificar stock:", e)
+        return jsonify({"error": "Error al modificar stock"}), 500
+
