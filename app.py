@@ -191,10 +191,6 @@ def eliminar_receta(receta_id):
     except sqlite3.Error as e:
         return jsonify({"error": "Error al eliminar receta"}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
 #AGREGA STOCK Y PONDERA PRECIOS INGREDIENTES
 
 @app.route('/api/insumos/actualizar_stock', methods=['PUT'])
@@ -244,4 +240,70 @@ def modificar_insumo_stock():
     except sqlite3.Error as e:
         print("Error al modificar stock:", e)
         return jsonify({"error": "Error al modificar stock"}), 500
+    
+# Agregar insumo a una receta
+@app.route('/api/recetas/agregar_insumo', methods=['POST'])
+def agregar_insumo_a_receta():
+    data = request.json
+    receta_id = data.get('receta_id')
+    insumo_id = data.get('insumo_id')
+    cantidad_ingresada = data.get('cantidad')
+    unidad_ingresada = data.get('unidad_medida')
 
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # Obtener la unidad de medida original del insumo
+        cursor.execute("SELECT unidad_medida FROM insumos WHERE id = ?", (insumo_id,))
+        insumo = cursor.fetchone()
+
+        if not insumo:
+            return jsonify({"error": "Insumo no encontrado"}), 404
+
+        unidad_original = insumo[0]
+
+        # Conversión de unidades
+        conversiones = {
+            ("g", "kg"): 1000,   # 1000 g = 1 kg
+            ("kg", "g"): 1 / 1000,
+            ("ml", "l"): 1000,   # 1000 ml = 1 l
+            ("l", "ml"): 1 / 1000
+        }
+
+        if unidad_ingresada != unidad_original:
+            clave_conversion = (unidad_ingresada.lower(), unidad_original.lower())
+            if clave_conversion in conversiones:
+                cantidad_convertida = cantidad_ingresada / conversiones[clave_conversion]
+            else:
+                return jsonify({"error": "Conversión no soportada"}), 400
+        else:
+            cantidad_convertida = cantidad_ingresada
+
+        # Insertar en la tabla receta_insumos con la cantidad convertida
+        cursor.execute("""
+            INSERT INTO receta_insumos (receta_id, insumo_id, cantidad)
+            VALUES (?, ?, ?)
+        """, (receta_id, insumo_id, cantidad_convertida))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            "message": "Insumo agregado a la receta correctamente",
+            "receta_id": receta_id,
+            "insumo_id": insumo_id,
+            "cantidad_guardada": cantidad_convertida,
+            "unidad_original": unidad_original
+        }), 201
+
+    except sqlite3.Error as e:
+        print("Error al agregar insumo a receta:", e)
+        return jsonify({"error": "Error en la base de datos"}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

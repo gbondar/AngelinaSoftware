@@ -150,6 +150,17 @@ button:hover {
     position: absolute;
 }
 
+.modal-content h2 {
+    background-color: #e6d190;
+    padding: 12px 15px;
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #5A3B81;
+    text-align: center;
+    border-bottom: 1px solid #b0a08b;
+}
+
 /* Botón de cerrar */
 .close-button {
     position: absolute;
@@ -178,7 +189,7 @@ button:hover {
 .insumos-table th, .insumos-table td {
     border: 1px solid black;
     padding: 10px;
-    text-align: left;
+    text-align: center;
 }
 
 .insumos-table th {
@@ -256,7 +267,7 @@ select:focus {
 .recetas-table th, .recetas-table td {
     border: 1px solid black;
     padding: 10px;
-    text-align: left;
+    text-align: center;
 }
 
 .recetas-table th {
