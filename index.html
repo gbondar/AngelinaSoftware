@@ -80,25 +80,30 @@
             </form>            
         </div>
     </div>
- <!-- Modal de Modificar insumo -->
+    <!-- Modal de Modificar insumo -->
     <div id="modifModal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="closeModifModal" onclick="closeModifModal()">&times;</span>
             <h2>Modificar Insumo</h2>
             <form id="modifInsumoForm">
+                
+                <!-- Selección de insumo -->
                 <label for="modifNombre">Insumo:</label>
                 <select id="modifNombre" required>
-                <option value="">Selecciona un insumo</option>
+                    <option value="">Selecciona un insumo</option>
                 </select>
-                
-                <label for="modifUnidad">Unidad de Medida:</label>
-                <input type="text" id="modifUnidad" required>
-                
-                <label for="modifCantidad">Cantidad:</label>
-                <input type="number" id="modifCantidad" required>
-                
-                <label for="modifPrecio">Precio Unitario:</label>
-                <input type="number" id="modifPrecio" required>
+
+                <!-- Selección de qué modificar -->
+                <label for="modifCampo">Categoría a modificar:</label>
+                <select id="modifCampo" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="unidad">Unidad de Medida</option>
+                    <option value="cantidad">Cantidad</option>
+                    <option value="precio">Precio Unitario</option>
+                </select>
+
+                <!-- Contenedor dinámico de campos -->
+                <div id="inputsModif"></div>
 
                 <div class="modal-buttons">
                     <button type="button" id="btnmodaceptInsumo">Aceptar</button>
@@ -107,6 +112,7 @@
             </form>
         </div>
     </div>
+
     <!-- Modal de Eliminar insumo -->
     <div id="elimModal" class="modal">
         <div class="modal-content">

@@ -274,13 +274,27 @@ select:focus {
 }
 
 #btnInsumos {
-    background-image: url('https://i.postimg.cc/jSHrR1bH/DALL-E-2025-02-05-16-28-37-A-black-and-white-3-D-minimalist-drawing-of-a-pastry-related-utensil-su.webp');
+    background-image: url('https://i.postimg.cc/h46ZbHtt/DALL-E-2025-02-06-09-58-35-A-black-and-white-3-D-minimalist-drawing-of-a-pastry-related-utensil-su.webp');
 }
 
 #btnReportes {
     background-image: url('https://i.postimg.cc/t7GsZnHx/DALL-E-2025-02-05-16-29-43-A-black-and-white-3-D-minimalist-illustration-of-a-spreadsheet-or-data-s.webp');
 }
 
+/* Asegurar que el select tenga estilos consistentes */
+#addModal select, #modifModal select {
+    font-size: 16px;  /* Aumentar tamaño del texto */
+    padding: 8px;  
+    border-radius: 5px;  
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+/* Modificar el menú desplegable (dropdown) */
+#addModal select option, #modifModal select option {
+    font-size: 18px;  /* Aumenta el tamaño del texto en el menú */
+    padding: 12px;    /* Más espacio en cada opción */
+}
 
 
 /* Responsive para pantallas menores a 820px */

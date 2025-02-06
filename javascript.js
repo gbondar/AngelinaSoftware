@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const addModal = document.getElementById("addModal");
     const modifModal = document.getElementById("modifModal");
     const insumosContainer = document.getElementById("tableBody");
+    const modifNombre = document.getElementById("modifNombre");
+    const modifCampo = document.getElementById("modifCampo");
+    const inputsModif = document.getElementById("inputsModif");
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
@@ -19,8 +22,31 @@ document.addEventListener("DOMContentLoaded", () => {
     
     
     */
-    
 
+
+      // Evento para seleccionar qué campo modificar
+      let insumoSeleccionado = {}; // Almacena los datos del insumo seleccionado
+
+      // Evento para seleccionar qué campo modificar
+      modifCampo.addEventListener("change", () => {
+          actualizarOrdenInputs();
+      });
+  
+      // Evento para cargar datos del insumo seleccionado
+      modifNombre.addEventListener("change", async () => {
+          const nombre = modifNombre.value;
+          if (!nombre) return;
+  
+          try {
+              const response = await fetch(`http://localhost:5000/api/insumos/${encodeURIComponent(nombre)}`);
+              if (!response.ok) throw new Error("Error al obtener el insumo");
+              insumoSeleccionado = await response.json();
+              
+              actualizarOrdenInputs(); // Una vez que tenemos los datos, reordenamos
+          } catch (error) {
+              alert(error.message);
+          }
+      });
 
     //click de insumos
     document.getElementById("btnInsumos").addEventListener("click", fetchInsumos);
@@ -39,9 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //click modificar insumo
     document.getElementById("btnModifInsumo").addEventListener("click", openModifModal);
-
-    //click modificar-aceptar insumo
-    document.getElementById("btnmodaceptInsumo").addEventListener("click", modifyInsumo);
 
      //click cancelar agregar insumo
      document.getElementById("btnmodcancelInsumo").addEventListener("click", closeModifModal);
@@ -237,6 +260,64 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = "none";
     }
 
+    function actualizarOrdenInputs() {
+        const selectedField = modifCampo.value;
+        if (!selectedField || !insumoSeleccionado) return;
+    
+        // Extraer estilos de un input original
+        const originalInput = document.querySelector("input");
+        const computedStyles = window.getComputedStyle(originalInput);
+    
+        const fields = {
+            unidad: { label: "Unidad de Medida:", value: insumoSeleccionado.unidad_medida, type: "text" },
+            cantidad: { label: "Cantidad:", value: insumoSeleccionado.cantidad, type: "number" },
+            precio: { label: "Precio Unitario:", value: insumoSeleccionado.precio_unitario, type: "number" }
+        };
+    
+        const orderedFields = [selectedField, ...Object.keys(fields).filter(f => f !== selectedField)];
+    
+        inputsModif.innerHTML = ""; 
+        inputsModif.style.display = "flex";  
+        inputsModif.style.flexDirection = "column";  
+        inputsModif.style.gap = "15px";  
+        inputsModif.style.width = "100%"; 
+    
+        orderedFields.forEach((key, index) => {
+            const fieldData = fields[key];
+            const isEditable = index === 0;
+    
+            // Crear label
+            const label = document.createElement("label");
+            label.setAttribute("for", `modif${key.charAt(0).toUpperCase() + key.slice(1)}`);
+            label.textContent = fieldData.label;
+            label.style.fontSize = computedStyles.fontSize;
+            label.style.fontWeight = computedStyles.fontWeight;
+            label.style.fontFamily = computedStyles.fontFamily;
+    
+            // Crear input
+            const input = document.createElement("input");
+            input.setAttribute("type", fieldData.type);
+            input.setAttribute("id", `modif${key.charAt(0).toUpperCase() + key.slice(1)}`);
+            input.value = fieldData.value;
+            input.disabled = !isEditable;
+    
+            // Aplicar estilos del input original
+            input.style.width = computedStyles.width;
+            input.style.padding = computedStyles.padding;
+            input.style.borderRadius = computedStyles.borderRadius;
+            input.style.border = computedStyles.border;
+            input.style.fontSize = computedStyles.fontSize;
+            input.style.fontFamily = computedStyles.fontFamily;
+            input.style.fontWeight = computedStyles.fontWeight;
+            input.style.marginBottom = computedStyles.marginBottom;
+            input.style.color = isEditable ? computedStyles.color : "#888";  
+            input.style.backgroundColor = isEditable ? "#ffffff" : "#e0e0e0";
+    
+            inputsModif.appendChild(label);
+            inputsModif.appendChild(input);
+        });
+    }
+    
     function openAddModal() {
         fetch("http://localhost:5000/api/insumos")
             .then(response => response.json())
@@ -298,62 +379,65 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("modalRecetas").style.display = "flex";
     }
 
-    function openModifModal() {
-        fetch("http://localhost:5000/api/insumos")
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById("modifNombre");
-                select.innerHTML = '<option value="">Selecciona un insumo</option>'; // Resetear opciones
-    
-                data.forEach(insumo => {
-                    const option = document.createElement("option");
-                    option.value = insumo.nombre;
-                    option.textContent = insumo.nombre;
-    
-                    // Si el insumo seleccionado es el mismo, se preselecciona
-                    if (window.selectedInsumo && window.selectedInsumo.nombre === insumo.nombre) {
-                        option.selected = true;
-                    }
-    
-                    select.appendChild(option);
-                });
-    
-                // Función para actualizar los campos al cambiar el select
-                function updateFields(selectedName) {
-                    const selectedInsumo = data.find(insumo => insumo.nombre === selectedName);
-                    if (selectedInsumo) {
-                        document.getElementById("modifUnidad").value = selectedInsumo.unidad_medida;
-                        document.getElementById("modifCantidad").value = selectedInsumo.cantidad;
-                        document.getElementById("modifPrecio").value = selectedInsumo.precio_unitario;
-                    } else {
-                        document.getElementById("modifUnidad").value = "";
-                        document.getElementById("modifCantidad").value = "";
-                        document.getElementById("modifPrecio").value = "";
-                    }
-                }
-    
-                // Si ya había un insumo seleccionado, actualizar los campos al abrir el modal
-                if (window.selectedInsumo) {
-                    updateFields(window.selectedInsumo.nombre);
-                }
-    
-                // Escuchar cambios en el select para actualizar los campos dinámicamente
-                select.addEventListener("change", (event) => {
-                    updateFields(event.target.value);
-                });
-    
-                modifModal.style.display = "flex";
-            })
-            .catch(error => {
-                alert("Error al cargar los insumos para modificar.");
-                console.error(error);
+    async function openModifModal() {
+        try {
+            const response = await fetch("http://localhost:5000/api/insumos");
+            if (!response.ok) throw new Error("Error al obtener los insumos.");
+            const data = await response.json();
+
+            modifNombre.innerHTML = '<option value="">Selecciona un insumo</option>';
+            data.forEach(insumo => {
+                const option = document.createElement("option");
+                option.value = insumo.nombre;
+                option.textContent = insumo.nombre;
+                modifNombre.appendChild(option);
             });
+
+            modifModal.style.display = "flex";
+        } catch (error) {
+            alert(error.message);
+        }
     }
-    
+
+    document.getElementById("btnmodaceptInsumo").addEventListener("click", async () => {
+        const selectedField = modifCampo.value;
+        if (!selectedField || !insumoSeleccionado) {
+            alert("Selecciona un insumo y un campo a modificar.");
+            return;
+        }
+
+        // Obtener el valor del input modificado
+        const updatedValue = document.getElementById(`modif${selectedField.charAt(0).toUpperCase() + selectedField.slice(1)}`).value;
+
+        // Enviar la actualización con TODOS los valores (manteniendo los no modificados)
+        const updatedInsumo = {
+            nombre: insumoSeleccionado.nombre,
+            unidad_medida: selectedField === "unidad" ? updatedValue : insumoSeleccionado.unidad_medida,
+            cantidad: selectedField === "cantidad" ? updatedValue : insumoSeleccionado.cantidad,
+            precio_unitario: selectedField === "precio" ? updatedValue : insumoSeleccionado.precio_unitario
+        };
+
+        try {
+            const response = await fetch("http://localhost:5000/api/insumos", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedInsumo)
+            });
+
+            if (!response.ok) throw new Error("Error al modificar el insumo.");
+            alert("Insumo modificado con éxito.");
+            closeModifModal();
+            fetchInsumos(); // Recargar tabla
+        } catch (error) {
+            alert(error.message);
+        }
+    });
     
     
     function closeModifModal() {
         modifModal.style.display = "none";
+        insumoSeleccionado = {}; // Limpiar datos del insumo seleccionado
+        inputsModif.innerHTML = ""; // Limpiar inputs
     }
 
     function closeModifRecModal() {
@@ -405,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const precioNuevo = parseFloat(document.getElementById("precio").value);
     
         if (!cantidadNueva || !precioNuevo || cantidadNueva <= 0 || precioNuevo <= 0) {
-            alert("Por favor, ingrese valores válidos.");
+            alert("Por favor, complete todos los campos.");
             return;
         }
     
@@ -458,8 +542,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const precioActual = parseFloat(insumoExistente.precio_unitario);
             
                 const nuevaCantidadTotal = cantidadActual + cantidadNueva;
-                const nuevoPrecioUnitario = ((cantidadActual * precioActual) + (cantidadNueva * precioNuevo)) / nuevaCantidadTotal;
-            
+                const nuevoPrecioUnitario = parseFloat(
+                    (((cantidadActual * precioActual) + (cantidadNueva * precioNuevo)) / nuevaCantidadTotal).toFixed(1)
+                );
+                            
                 // Enviar actualización al backend
                 fetch(`http://localhost:5000/api/insumos`, {
                     method: "PUT",
