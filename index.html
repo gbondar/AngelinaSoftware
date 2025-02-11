@@ -203,5 +203,33 @@
         </div>
     </div>
     <script src="javascript.js"></script>
+
+    <!-- Modal de Modificar Insumos en Receta -->
+    <div id="modifInsumosRecetaModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeInsuRecet">&times;</span>
+            <h2>Modificar Insumos en Receta</h2>
+
+            <label for="recetaSelect">Selecciona una receta:</label>
+            <select id="recetaSelect" required></select>
+
+            <div id="insumosContainer">
+                <!-- Aquí se agregarán dinámicamente los inputs -->
+            </div>
+
+            <button type="button" id="btnAgregarNuevoInsumo">Agregar Insumo</button>
+
+            <div class="modal-buttons">
+                <button type="button" id="btnAceptarModifInsumo">Aceptar</button>
+                <button type="button" id='btnCancelarModifInsumo'">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante "+" -->
+    <button id="floatingButton">+</button>
+
+
+
 </body>
 </html>

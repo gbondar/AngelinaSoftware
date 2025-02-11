@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modifNombre = document.getElementById("modifNombre");
     const modifCampo = document.getElementById("modifCampo");
     const inputsModif = document.getElementById("inputsModif");
+    const modifInsumosRecetaModal = document.getElementById('modifInsumosRecetaModal');
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
@@ -17,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     modalRecetas.style.display = "none";
     addModalRecetas.style.display = "none";
     modifModalRecetas.style.display = "none";
+    modifInsumosRecetaModal.style.display = "none";
+    document.getElementById("floatingButton").style.display = "flex";
+
      /*
     elimModalRecetas.style.display = "none";
     
@@ -125,7 +129,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("closeModifModalRecetas").addEventListener("click", closeModifModalRecetas);
     document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
+    document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
 
+    // Click para abrir el modal de modificar insumo-receta
+    document.getElementById("floatingButton").addEventListener("click", function() {
+        document.getElementById("modifInsumosRecetaModal").style.display = "flex";
+    });
+
+    //Click para cerrar el modal de modificar insumo-receta
+    document.getElementById("btnCancelarModifInsumo").addEventListener("click", function() {
+        document.getElementById("modifInsumosRecetaModal").style.display = "none";
+    });
+
+   
     
 
     
@@ -184,6 +200,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeElimModalRecetas() {
         document.getElementById("elimModalRecetas").style.display = "none";
+    }
+    function closeModifInsumosRecetaModal() {
+        document.getElementById("modifInsumosRecetaModal").style.display = "none";
     }
     
     
@@ -477,6 +496,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("elimModalRecetas").style.display = "flex";
     }
     
+    //Botones de insumo-receta
+    function openModifInsumosRecetaModal() {
+        document.getElementById('modifInsumosRecetaModal').style.display = 'flex';
+    }
     
 
 
