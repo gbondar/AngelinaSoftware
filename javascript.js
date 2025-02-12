@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modifCampo = document.getElementById("modifCampo");
     const inputsModif = document.getElementById("inputsModif");
     const modifInsumosRecetaModal = document.getElementById('modifInsumosRecetaModal');
+    const recetaSelect = document.getElementById("recetaSelect");
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
@@ -131,16 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
     document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
 
-    // Click para abrir el modal de modificar insumo-receta
-    document.getElementById("floatingButton").addEventListener("click", function() {
-        document.getElementById("modifInsumosRecetaModal").style.display = "flex";
-    });
-
-    //Click para cerrar el modal de modificar insumo-receta
-    document.getElementById("btnCancelarModifInsumo").addEventListener("click", function() {
-        document.getElementById("modifInsumosRecetaModal").style.display = "none";
-    });
-
+    
    
     
 
@@ -204,6 +196,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeModifInsumosRecetaModal() {
         document.getElementById("modifInsumosRecetaModal").style.display = "none";
     }
+
+
     
     
     
@@ -417,6 +411,47 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(error.message);
         }
     }
+
+    async function cargarRecetas() {
+        try {
+            const response = await fetch("http://localhost:5000/api/recetas");
+            if (!response.ok) throw new Error("Error al obtener recetas");
+
+            const recetas = await response.json();
+            recetaSelect.innerHTML = ""; // Limpiar select antes de agregar nuevas opciones
+
+            // Agregar opción por defecto
+            const defaultOption = document.createElement("option");
+            defaultOption.textContent = "Seleccione una receta";
+            defaultOption.value = "";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            recetaSelect.appendChild(defaultOption);
+
+            // Agregar recetas obtenidas de la API
+            recetas.forEach(receta => {
+                const option = document.createElement("option");
+                option.value = receta.id;
+                option.textContent =receta.nombre;
+                recetaSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando recetas:", error);
+        }
+    }
+
+    // Click para abrir el modal de modificar insumo-receta
+    document.getElementById("floatingButton").addEventListener("click", function() {
+        document.getElementById("modifInsumosRecetaModal").style.display = "flex";
+        cargarRecetas();
+    });
+
+    //Click para cerrar el modal de modificar insumo-receta
+    document.getElementById("btnCancelarModifInsumo").addEventListener("click", function() {
+        document.getElementById("modifInsumosRecetaModal").style.display = "none";
+    });
+
+
 
     document.getElementById("btnmodaceptInsumo").addEventListener("click", async () => {
         const selectedField = modifCampo.value;

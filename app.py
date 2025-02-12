@@ -115,6 +115,29 @@ def get_recetas():
         return jsonify([dict(row) for row in recetas])
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener recetas"}), 500
+    
+# Leer insumos de una receta específica
+@app.route('/api/receta_insumos/<int:receta_id>', methods=['GET'])
+def get_receta_insumos(receta_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT i.nombre, ri.cantidad, i.unidad_medida 
+            FROM receta_insumos ri
+            JOIN insumos i ON ri.insumo_id = i.id
+            WHERE ri.receta_id = ?
+        """, (receta_id,))
+        
+        insumos = cursor.fetchall()
+        conn.close()
+        
+        return jsonify([dict(row) for row in insumos])
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al obtener insumos de la receta"}), 500
 
 #LEER DATOS
 
