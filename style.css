@@ -341,6 +341,22 @@ select:focus {
     margin-top: 20px; /* Ajusta el valor según la distancia deseada */
 }
 
+/* Contenedor de los insumos en el modal */
+.insumos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Fila de insumos (cada insumo con sus inputs) */
+.fila-insumo {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 
 /* Responsive para pantallas menores a 820px */
 @media (max-width: 820px) {

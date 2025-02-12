@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputsModif = document.getElementById("inputsModif");
     const modifInsumosRecetaModal = document.getElementById('modifInsumosRecetaModal');
     const recetaSelect = document.getElementById("recetaSelect");
+    const insumoRecetaContainer = document.getElementById("insumoRecetaContainer");
+    const btnAgregarNuevoInsumo = document.getElementById("btnAgregarNuevoInsumo");
+
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
@@ -195,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     function closeModifInsumosRecetaModal() {
         document.getElementById("modifInsumosRecetaModal").style.display = "none";
+        limpiarInsumosAgregados()
     }
 
 
@@ -449,6 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //Click para cerrar el modal de modificar insumo-receta
     document.getElementById("btnCancelarModifInsumo").addEventListener("click", function() {
         document.getElementById("modifInsumosRecetaModal").style.display = "none";
+        limpiarInsumosAgregados()
     });
 
 
@@ -535,6 +540,127 @@ document.addEventListener("DOMContentLoaded", () => {
     function openModifInsumosRecetaModal() {
         document.getElementById('modifInsumosRecetaModal').style.display = 'flex';
     }
+
+      // Función para obtener los insumos desde el backend para modulo receta insumos
+    async function cargarInsumos() {
+        try {
+            const response = await fetch("http://localhost:5000/api/insumos");
+            if (!response.ok) throw new Error("Error al obtener insumos");
+
+            return await response.json();
+        } catch (error) {
+            console.error("Error cargando insumos:", error);
+            return [];
+        }
+    }
+
+
+     // Función para obtener unidades equivalentes modulo receta insumos
+     function obtenerUnidadesEquivalentes(unidadBase) {
+        const equivalencias = {
+            "Kg": ["Kg", "Gr"],
+            "Gr": ["Kg", "Gr"],
+            "Lt": ["Lt", "Ml"],
+            "ml": ["Lt", "Ml"],
+            "Unidades": ["Unidades"]
+        };
+
+        return equivalencias[unidadBase] || [unidadBase]; // Si no está en la lista, devuelve la unidad original
+    }
+
+    // Función para agregar una nueva fila con selects dinámicos modulo receta insumos
+    async function agregarFilaInsumo() {
+        const row = document.createElement("div");
+        row.classList.add("fila-insumo");
+
+        // Obtener los insumos del backend
+        const insumos = await cargarInsumos();
+
+        // Crear el select de insumo
+        const selectInsumo = document.createElement("select");
+        selectInsumo.classList.add("insumo", "form-select");
+
+        // Opción por defecto
+        const defaultOptionInsumo = document.createElement("option");
+        defaultOptionInsumo.value = "";
+        defaultOptionInsumo.textContent = "Selecciona un insumo";
+        defaultOptionInsumo.disabled = true;
+        defaultOptionInsumo.selected = true;
+        selectInsumo.appendChild(defaultOptionInsumo);
+
+        // Agregar opciones de insumos obtenidos del backend
+        insumos.forEach(insumo => {
+            const option = document.createElement("option");
+            option.value = insumo.nombre;
+            option.textContent = insumo.nombre;
+            option.setAttribute("data-unidad", insumo.unidad_medida); // Guardar unidad de medida en atributo
+            selectInsumo.appendChild(option);
+        });
+
+        // Crear el select de unidad de medida
+        const selectUnidad = document.createElement("select");
+        selectUnidad.classList.add("unidad", "form-select");
+
+        // Opción por defecto
+        const defaultOptionUnidad = document.createElement("option");
+        defaultOptionUnidad.value = "";
+        defaultOptionUnidad.textContent = "Unidad de Medida";
+        defaultOptionUnidad.disabled = true;
+        defaultOptionUnidad.selected = true;
+        selectUnidad.appendChild(defaultOptionUnidad);
+
+        // Actualizar unidad de medida cuando se seleccione un insumo
+        selectInsumo.addEventListener("change", function () {
+            const selectedOption = selectInsumo.options[selectInsumo.selectedIndex];
+            const unidadMedida = selectedOption.getAttribute("data-unidad"); // Obtener la unidad de medida
+
+            selectUnidad.innerHTML = ""; // Limpiar unidades previas
+
+            // Obtener las unidades equivalentes
+            const unidadesDisponibles = obtenerUnidadesEquivalentes(unidadMedida);
+
+            // Agregar todas las opciones disponibles al select de unidades
+            unidadesDisponibles.forEach(unidad => {
+                const option = document.createElement("option");
+                option.value = unidad;
+                option.textContent = unidad;
+                selectUnidad.appendChild(option);
+            });
+        });
+
+        // Input de Cantidad
+        const inputCantidad = document.createElement("input");
+        inputCantidad.type = "number";
+        inputCantidad.placeholder = "Cantidad";
+        inputCantidad.classList.add("cantidad", "form-input");
+        inputCantidad.min = "0";
+
+        // Botón para eliminar la fila
+        const btnEliminar = document.createElement("button");
+        btnEliminar.textContent = "❌";
+        btnEliminar.classList.add("eliminarFila");
+        btnEliminar.addEventListener("click", () => row.remove());
+
+        // Agregar los elementos al contenedor
+        row.appendChild(selectInsumo);
+        row.appendChild(selectUnidad);
+        row.appendChild(inputCantidad);
+        row.appendChild(btnEliminar);
+
+        insumoRecetaContainer.appendChild(row);
+    }
+
+    btnAgregarNuevoInsumo.addEventListener("click", agregarFilaInsumo);
+
+    function limpiarInsumosAgregados() {
+        document.getElementById("insumoRecetaContainer").innerHTML = ""; // Borra todas las filas agregadas
+    }
+
+    document.getElementById("recetaSelect").addEventListener("change", function () {
+        limpiarInsumosAgregados();
+    });
+    
+
     
 
 

@@ -138,6 +138,74 @@ def get_receta_insumos(receta_id):
         return jsonify([dict(row) for row in insumos])
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener insumos de la receta"}), 500
+    
+#Agregar insumo-receta
+# Conversión de unidades (kg ↔ g, lt ↔ ml)
+def convertir_unidad(cantidad, unidad_origen, unidad_destino):
+    conversiones = {
+        ("Kg", "Gr"): 1000,
+        ("Gr", "Kg"): 0.001,
+        ("Lt", "Ml"): 1000,
+        ("Ml", "Lt"): 0.001,
+        ("Unidades", "Unidades"): 1  # No cambia
+    }
+
+    if (unidad_origen, unidad_destino) in conversiones:
+        return cantidad * conversiones[(unidad_origen, unidad_destino)]
+    else:
+        return None  # Conversión no válida
+
+# Endpoint para actualizar/agregar insumos a una receta
+@app.route('/api/receta_insumos/<int:receta_id>', methods=['PUT'])
+def actualizar_receta_insumos(receta_id):
+    data = request.json  # Recibir lista de insumos desde el frontend
+
+    if not isinstance(data, list):  # Validar que sea una lista
+        return jsonify({"error": "Los datos deben ser una lista de insumos"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        for insumo in data:
+            insumo_id = insumo.get("insumo_id")
+            cantidad = insumo.get("cantidad")
+            unidad_medida = insumo.get("unidad_medida")
+
+            if not all([insumo_id, cantidad, unidad_medida]):
+                continue  # Si falta algún dato, omitir
+
+            # Obtener la unidad base desde la base de datos
+            cursor.execute("SELECT unidad_medida FROM insumos WHERE id = ?", (insumo_id,))
+            resultado = cursor.fetchone()
+            if not resultado:
+                continue  # Insumo no encontrado
+
+            unidad_base = resultado["unidad_medida"]  # Unidad de medida original
+
+            # Convertir cantidad si la unidad ingresada es diferente a la base
+            if unidad_medida != unidad_base:
+                cantidad_convertida = convertir_unidad(cantidad, unidad_medida, unidad_base)
+                if cantidad_convertida is None:
+                    return jsonify({"error": f"No se puede convertir {unidad_medida} a {unidad_base}"}), 400
+            else:
+                cantidad_convertida = cantidad
+
+            # Insertar o actualizar el insumo en la receta
+            cursor.execute("""
+                INSERT INTO receta_insumos (receta_id, insumo_id, cantidad)
+                VALUES (?, ?, ?)
+                ON CONFLICT(receta_id, insumo_id) DO UPDATE SET cantidad = ?
+            """, (receta_id, insumo_id, cantidad_convertida, cantidad_convertida))
+
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Receta actualizada correctamente"}), 200
+
+    except sqlite3.Error as e:
+        conn.rollback()
+        return jsonify({"error": "Error al actualizar insumos"}), 500
+
 
 #LEER DATOS
 
