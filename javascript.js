@@ -10,7 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const recetaSelect = document.getElementById("recetaSelect");
     const insumoRecetaContainer = document.getElementById("insumoRecetaContainer");
     const btnAgregarNuevoInsumo = document.getElementById("btnAgregarNuevoInsumo");
-
+    const btnAceptarModifInsumo = document.getElementById("btnAceptarModifInsumo");
+    
+    
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
@@ -436,6 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
             recetas.forEach(receta => {
                 const option = document.createElement("option");
                 option.value = receta.id;
+                option.setAttribute("data-id", receta.id); // Guardar receta-id en un atributo
                 option.textContent =receta.nombre;
                 recetaSelect.appendChild(option);
             });
@@ -572,14 +575,14 @@ document.addEventListener("DOMContentLoaded", () => {
     async function agregarFilaInsumo() {
         const row = document.createElement("div");
         row.classList.add("fila-insumo");
-
+    
         // Obtener los insumos del backend
         const insumos = await cargarInsumos();
-
+    
         // Crear el select de insumo
         const selectInsumo = document.createElement("select");
         selectInsumo.classList.add("insumo", "form-select");
-
+    
         // Opción por defecto
         const defaultOptionInsumo = document.createElement("option");
         defaultOptionInsumo.value = "";
@@ -587,20 +590,20 @@ document.addEventListener("DOMContentLoaded", () => {
         defaultOptionInsumo.disabled = true;
         defaultOptionInsumo.selected = true;
         selectInsumo.appendChild(defaultOptionInsumo);
-
+    
         // Agregar opciones de insumos obtenidos del backend
         insumos.forEach(insumo => {
             const option = document.createElement("option");
-            option.value = insumo.nombre;
+            option.value = insumo.id;  // ✅ Ahora el value contiene el ID correctamente
             option.textContent = insumo.nombre;
-            option.setAttribute("data-unidad", insumo.unidad_medida); // Guardar unidad de medida en atributo
+            option.setAttribute("data-unidad", insumo.unidad_medida);  // Almacenar unidad base
             selectInsumo.appendChild(option);
         });
-
+    
         // Crear el select de unidad de medida
         const selectUnidad = document.createElement("select");
         selectUnidad.classList.add("unidad", "form-select");
-
+    
         // Opción por defecto
         const defaultOptionUnidad = document.createElement("option");
         defaultOptionUnidad.value = "";
@@ -608,17 +611,17 @@ document.addEventListener("DOMContentLoaded", () => {
         defaultOptionUnidad.disabled = true;
         defaultOptionUnidad.selected = true;
         selectUnidad.appendChild(defaultOptionUnidad);
-
+    
         // Actualizar unidad de medida cuando se seleccione un insumo
         selectInsumo.addEventListener("change", function () {
             const selectedOption = selectInsumo.options[selectInsumo.selectedIndex];
             const unidadMedida = selectedOption.getAttribute("data-unidad"); // Obtener la unidad de medida
-
+    
             selectUnidad.innerHTML = ""; // Limpiar unidades previas
-
+    
             // Obtener las unidades equivalentes
             const unidadesDisponibles = obtenerUnidadesEquivalentes(unidadMedida);
-
+    
             // Agregar todas las opciones disponibles al select de unidades
             unidadesDisponibles.forEach(unidad => {
                 const option = document.createElement("option");
@@ -627,28 +630,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 selectUnidad.appendChild(option);
             });
         });
-
+    
         // Input de Cantidad
         const inputCantidad = document.createElement("input");
         inputCantidad.type = "number";
         inputCantidad.placeholder = "Cantidad";
         inputCantidad.classList.add("cantidad", "form-input");
         inputCantidad.min = "0";
-
+    
         // Botón para eliminar la fila
         const btnEliminar = document.createElement("button");
         btnEliminar.textContent = "❌";
         btnEliminar.classList.add("eliminarFila");
         btnEliminar.addEventListener("click", () => row.remove());
-
+    
         // Agregar los elementos al contenedor
         row.appendChild(selectInsumo);
         row.appendChild(selectUnidad);
         row.appendChild(inputCantidad);
         row.appendChild(btnEliminar);
-
+    
         insumoRecetaContainer.appendChild(row);
     }
+    
 
     btnAgregarNuevoInsumo.addEventListener("click", agregarFilaInsumo);
 
@@ -659,6 +663,99 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("recetaSelect").addEventListener("change", function () {
         limpiarInsumosAgregados();
     });
+    
+
+    //Boton aceptar para agregar receta-insumo
+        // Mapeo de conversiones de unidades (kg ↔ g, lt ↔ ml)
+        function convertirUnidad(cantidad, unidadOrigen, unidadDestino) {
+            const conversiones = {
+                "kg": { "g": 1000 },
+                "g": { "kg": 0.001 },
+                "lt": { "ml": 1000 },
+                "ml": { "lt": 0.001 },
+                "unidad": { "unidad": 1 }
+            };
+    
+            if (unidadOrigen === unidadDestino) {
+                return cantidad; // No hay conversión necesaria
+            }
+    
+            return conversiones[unidadOrigen]?.[unidadDestino] 
+                ? cantidad * conversiones[unidadOrigen][unidadDestino] 
+                : null; // Retorna null si la conversión no es válida
+        }
+    
+        async function enviarInsumosAlBackend() {
+            const recetaSelect = document.getElementById("recetaSelect");
+        
+            // Obtener receta_id desde el atributo correcto
+            const recetaId = recetaSelect.options[recetaSelect.selectedIndex].getAttribute("data-id");
+        
+            if (!recetaId) {
+                alert("Por favor selecciona una receta.");
+                return;
+            }
+        
+            const insumoRows = document.querySelectorAll(".fila-insumo");
+            const insumosData = [];
+        
+            insumoRows.forEach(row => {
+                const insumoSelect = row.querySelector(".insumo");
+                const unidadSelect = row.querySelector(".unidad");
+                const cantidadInput = row.querySelector(".cantidad");
+        
+                const insumoId = insumoSelect.value;  // ✅ Ahora obtiene el ID correctamente
+                const unidadMedidaSeleccionada = unidadSelect.value;
+                const cantidadIngresada = parseFloat(cantidadInput.value);
+        
+                if (!insumoId || !unidadMedidaSeleccionada || isNaN(cantidadIngresada) || cantidadIngresada <= 0) {
+                    return; // Si falta algún dato, omitir esta fila
+                }
+        
+                // Obtener la unidad base del insumo seleccionado
+                const unidadBase = insumoSelect.options[insumoSelect.selectedIndex].getAttribute("data-unidad");
+        
+                // Convertir cantidad si es necesario
+                const cantidadConvertida = convertirUnidad(cantidadIngresada, unidadMedidaSeleccionada, unidadBase);
+                if (cantidadConvertida === null) {
+                    alert(`No se puede convertir ${unidadMedidaSeleccionada} a ${unidadBase}`);
+                    return;
+                }
+        
+                // Agregar insumo al array
+                insumosData.push({
+                    insumo_id: parseInt(insumoId),
+                    cantidad: cantidadConvertida,
+                    unidad_medida: unidadBase
+                });
+            });
+        
+            if (insumosData.length === 0) {
+                alert("No hay insumos válidos para agregar.");
+                return;
+            }
+        
+            // Enviar datos al backend con un PUT request
+            try {
+                const response = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(insumosData)
+                });
+        
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Error al actualizar receta");
+        
+                alert("Receta actualizada correctamente.");
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Hubo un problema al actualizar la receta.");
+            }
+        }
+        
+        
+    
+        btnAceptarModifInsumo.addEventListener("click", enviarInsumosAlBackend);
     
 
     

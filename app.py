@@ -26,7 +26,7 @@ def get_insumos():
 
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT nombre, cantidad, unidad_medida, precio_unitario FROM insumos")
+        cursor.execute("SELECT id,nombre, cantidad, unidad_medida, precio_unitario FROM insumos")
         insumos = cursor.fetchall()
         conn.close()
         print("Datos obtenidos de la base de datos:", insumos)
@@ -155,10 +155,12 @@ def convertir_unidad(cantidad, unidad_origen, unidad_destino):
     else:
         return None  # Conversión no válida
 
-# Endpoint para actualizar/agregar insumos a una receta
 @app.route('/api/receta_insumos/<int:receta_id>', methods=['PUT'])
 def actualizar_receta_insumos(receta_id):
     data = request.json  # Recibir lista de insumos desde el frontend
+
+    print("🔹 Receta ID recibido:", receta_id)
+    print("🔹 Datos recibidos:", data)
 
     if not isinstance(data, list):  # Validar que sea una lista
         return jsonify({"error": "Los datos deben ser una lista de insumos"}), 400
@@ -175,18 +177,22 @@ def actualizar_receta_insumos(receta_id):
             if not all([insumo_id, cantidad, unidad_medida]):
                 continue  # Si falta algún dato, omitir
 
+            print(f"Procesando insumo: ID={insumo_id}, Cantidad={cantidad}, Unidad={unidad_medida}")
+
             # Obtener la unidad base desde la base de datos
             cursor.execute("SELECT unidad_medida FROM insumos WHERE id = ?", (insumo_id,))
             resultado = cursor.fetchone()
             if not resultado:
+                print(f"❌ Insumo {insumo_id} no encontrado en la base de datos.")
                 continue  # Insumo no encontrado
 
-            unidad_base = resultado["unidad_medida"]  # Unidad de medida original
+            unidad_base = resultado["unidad_medida"]
 
             # Convertir cantidad si la unidad ingresada es diferente a la base
             if unidad_medida != unidad_base:
                 cantidad_convertida = convertir_unidad(cantidad, unidad_medida, unidad_base)
                 if cantidad_convertida is None:
+                    print(f"❌ No se pudo convertir {unidad_medida} a {unidad_base}")
                     return jsonify({"error": f"No se puede convertir {unidad_medida} a {unidad_base}"}), 400
             else:
                 cantidad_convertida = cantidad
@@ -200,12 +206,13 @@ def actualizar_receta_insumos(receta_id):
 
         conn.commit()
         conn.close()
+        print("✅ Datos insertados correctamente en receta_insumos.")
         return jsonify({"message": "Receta actualizada correctamente"}), 200
 
     except sqlite3.Error as e:
         conn.rollback()
+        print("❌ Error en la base de datos:", e)
         return jsonify({"error": "Error al actualizar insumos"}), 500
-
 
 #LEER DATOS
 
