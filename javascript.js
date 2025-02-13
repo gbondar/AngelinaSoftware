@@ -447,6 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
     // Click para abrir el modal de modificar insumo-receta
     document.getElementById("floatingButton").addEventListener("click", function() {
         document.getElementById("modifInsumosRecetaModal").style.display = "flex";
@@ -627,21 +628,131 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
+    //Esto sirve para hacer que lea los insumos ya cargados a insumo-receta. 
+    document.getElementById("recetaSelect").addEventListener("change", async function () {
+        const recetaId = this.value;
+        if (!recetaId) return;
+    
+        try {
+            const response = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`);
+            if (!response.ok) throw new Error("Error al obtener los insumos de la receta");
+    
+            const insumosGuardados = await response.json();
+            insumoRecetaContainer.innerHTML = ""; // Limpiar inputs anteriores
+    
+            // Llamar a agregarFilaInsumoDesdeBD() para cada insumo de la BD
+            insumosGuardados.forEach(insumo => agregarFilaInsumoDesdeBD(insumo));
+        } catch (error) {
+            console.error("Error al obtener insumos de la receta:", error);
+            alert("Hubo un error al cargar los insumos de la receta.");
+        }
+    });
+    
+    
     
     
 
+    btnAgregarNuevoInsumo.addEventListener("click", agregarFilaInsumoManual);
+    
+
     // Función para agregar una nueva fila con selects dinámicos modulo receta insumos
-    async function agregarFilaInsumo() {
+    // ✅ Función para agregar insumos desde la Base de Datos (Con botón EDITAR)
+  // ✅ Función para agregar insumos desde la Base de Datos (Con botón EDITAR)
+    async function agregarFilaInsumoDesdeBD(insumoData) {
+        console.log("🟢 Agregando fila desde BD - Insumo Data:", insumoData);
+
         const row = document.createElement("div");
         row.classList.add("fila-insumo");
-    
-        // Obtener los insumos del backend
+
+        // Obtener los insumos del backend para poblar el select
         const insumos = await cargarInsumos();
-    
-        // Crear el select de insumo
+
+        // Crear el select de insumo (bloqueado)
         const selectInsumo = document.createElement("select");
         selectInsumo.classList.add("insumo", "form-select");
-    
+        selectInsumo.disabled = true; // Bloqueado porque viene de la BD
+
+        // Opción por defecto
+        const defaultOptionInsumo = document.createElement("option");
+        defaultOptionInsumo.value = "";
+        defaultOptionInsumo.textContent = "Selecciona un insumo";
+        defaultOptionInsumo.disabled = true;
+        selectInsumo.appendChild(defaultOptionInsumo);
+
+        // Agregar opciones de insumos
+        insumos.forEach(insumo => {
+            const option = document.createElement("option");
+            option.value = insumo.id;
+            option.textContent = insumo.nombre;
+            option.setAttribute("data-unidad", insumo.unidad_medida);
+            
+            // ✅ Comparar el nombre en vez de `insumo_id`
+            if (insumoData.insumo === insumo.nombre) option.selected = true;
+            
+            selectInsumo.appendChild(option);
+        });
+
+        // Crear el select de unidad de medida (bloqueado)
+        const selectUnidad = document.createElement("select");
+        selectUnidad.classList.add("unidad", "form-select");
+        selectUnidad.disabled = true; // Bloqueado porque viene de la BD
+
+        // Agregar unidad de medida
+        const optionUnidad = document.createElement("option");
+        optionUnidad.value = insumoData.unidad_medida;
+        optionUnidad.textContent = insumoData.unidad_medida;
+        optionUnidad.selected = true;
+        selectUnidad.appendChild(optionUnidad);
+
+        // Input de Cantidad (bloqueado)
+        const inputCantidad = document.createElement("input");
+        inputCantidad.type = "number";
+        inputCantidad.classList.add("cantidad", "form-input");
+        inputCantidad.value = insumoData.cantidad;
+        inputCantidad.disabled = true; // Bloqueado porque viene de la BD
+
+        // Botón de editar ✏️
+        const btnEditar = document.createElement("button");
+        btnEditar.textContent = "✏️";
+        btnEditar.classList.add("editarFila");
+        btnEditar.addEventListener("click", () => {
+            selectInsumo.disabled = false;
+            selectUnidad.disabled = false;
+            inputCantidad.disabled = false;
+            btnEditar.style.display = "none"; // Ocultar botón de editar después de activarlo
+        });
+
+        // Agregar elementos a la fila
+        row.appendChild(selectInsumo);
+        row.appendChild(selectUnidad);
+        row.appendChild(inputCantidad);
+        row.appendChild(btnEditar);
+        
+        insumoRecetaContainer.appendChild(row);
+    }
+
+
+    // ✅ Función para agregar insumos manualmente (Con botón ELIMINAR)
+    async function agregarFilaInsumoManual() {
+        console.log("🟢 Agregando fila manualmente");
+
+        const row = document.createElement("div");
+        row.classList.add("fila-insumo");
+
+        // Obtener los insumos del backend
+        const insumos = await cargarInsumos();
+
+        // Obtener los insumos ya agregados en receta_insumo
+        const insumosSeleccionados = [...document.querySelectorAll(".fila-insumo select.insumo")]
+            .map(select => select.value)
+            .filter(value => value !== "");
+
+        console.log("🔎 Insumos ya en receta:", insumosSeleccionados);
+
+        // Crear el select de insumo (editable)
+        const selectInsumo = document.createElement("select");
+        selectInsumo.classList.add("insumo", "form-select");
+
         // Opción por defecto
         const defaultOptionInsumo = document.createElement("option");
         defaultOptionInsumo.value = "";
@@ -649,14 +760,22 @@ document.addEventListener("DOMContentLoaded", () => {
         defaultOptionInsumo.disabled = true;
         defaultOptionInsumo.selected = true;
         selectInsumo.appendChild(defaultOptionInsumo);
-    
-        // Agregar opciones disponibles (sin repetidos)
-        actualizarOpcionesInsumo(selectInsumo, insumos);
-    
-        // Crear el select de unidad de medida
+
+        // Agregar opciones de insumos que NO estén ya en receta_insumo
+        insumos.forEach(insumo => {
+            if (!insumosSeleccionados.includes(insumo.id.toString())) { // Evita duplicados
+                const option = document.createElement("option");
+                option.value = insumo.id;
+                option.textContent = insumo.nombre;
+                option.setAttribute("data-unidad", insumo.unidad_medida);
+                selectInsumo.appendChild(option);
+            }
+        });
+
+        // Crear el select de unidad de medida (editable)
         const selectUnidad = document.createElement("select");
         selectUnidad.classList.add("unidad", "form-select");
-    
+
         // Opción por defecto
         const defaultOptionUnidad = document.createElement("option");
         defaultOptionUnidad.value = "";
@@ -664,50 +783,45 @@ document.addEventListener("DOMContentLoaded", () => {
         defaultOptionUnidad.disabled = true;
         defaultOptionUnidad.selected = true;
         selectUnidad.appendChild(defaultOptionUnidad);
-    
-        // Actualizar la lista de unidades cuando se seleccione un insumo
+
+        // Actualizar unidades cuando se selecciona un insumo
         selectInsumo.addEventListener("change", function () {
             const selectedOption = selectInsumo.options[selectInsumo.selectedIndex];
-            const unidadMedida = selectedOption.getAttribute("data-unidad"); // Obtener la unidad de medida
-    
+            const unidadMedida = selectedOption.getAttribute("data-unidad");
             selectUnidad.innerHTML = ""; // Limpiar unidades previas
-            actualizarOpcionesUnidad(selectUnidad, unidadMedida);
-    
-            // Bloquear insumos ya seleccionados en todos los selects
-            actualizarTodosLosSelects();
+            const unidadesDisponibles = obtenerUnidadesEquivalentes(unidadMedida);
+            unidadesDisponibles.forEach(unidad => {
+                const optionUnidad = document.createElement("option");
+                optionUnidad.value = unidad;
+                optionUnidad.textContent = unidad;
+                selectUnidad.appendChild(optionUnidad);
+            });
         });
-    
-        // Input de Cantidad
+
+        // Input de Cantidad (editable)
         const inputCantidad = document.createElement("input");
         inputCantidad.type = "number";
-        inputCantidad.placeholder = "Cantidad";
         inputCantidad.classList.add("cantidad", "form-input");
         inputCantidad.min = "0";
-    
-        // Botón para eliminar la fila
+
+        // Botón de eliminar ❌
         const btnEliminar = document.createElement("button");
         btnEliminar.textContent = "❌";
         btnEliminar.classList.add("eliminarFila");
         btnEliminar.addEventListener("click", () => {
             row.remove();
-            actualizarTodosLosSelects(); // Al eliminar un insumo, volver a actualizar los selects
         });
-    
-        // Agregar los elementos al contenedor
+
+        // Agregar elementos a la fila
         row.appendChild(selectInsumo);
         row.appendChild(selectUnidad);
         row.appendChild(inputCantidad);
         row.appendChild(btnEliminar);
-    
+        
         insumoRecetaContainer.appendChild(row);
-    
-        // Asegurar que los selects se actualicen
-        actualizarTodosLosSelects();
     }
-    
-    
 
-    btnAgregarNuevoInsumo.addEventListener("click", agregarFilaInsumo);
+
 
     function limpiarInsumosAgregados() {
         document.getElementById("insumoRecetaContainer").innerHTML = ""; // Borra todas las filas agregadas
@@ -750,17 +864,19 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         
             const insumoRows = document.querySelectorAll(".fila-insumo");
-            const insumosData = [];
             let errores = [];  // Array para almacenar errores
+            let insumosActualizar = [];
+            let insumosEliminar = [];
         
             insumoRows.forEach((row, index) => {
                 const insumoSelect = row.querySelector(".insumo");
                 const unidadSelect = row.querySelector(".unidad");
                 const cantidadInput = row.querySelector(".cantidad");
         
-                const insumoId = insumoSelect.value;  // ✅ Ahora obtiene el ID correctamente
+                const insumoId = insumoSelect.value;
                 const unidadMedidaSeleccionada = unidadSelect.value;
                 const cantidadIngresada = parseFloat(cantidadInput.value);
+                const esNuevo = row.querySelector(".eliminarFila") !== null; // ✅ Si tiene botón de eliminar, es un insumo nuevo
         
                 // Validaciones
                 if (!insumoId) {
@@ -769,11 +885,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!unidadMedidaSeleccionada) {
                     errores.push(`Fila ${index + 1}: No has seleccionado una unidad de medida.`);
                 }
-                if (isNaN(cantidadIngresada) || cantidadIngresada <= 0) {
-                    errores.push(`Fila ${index + 1}: La cantidad debe ser mayor a 0.`);
+                if (isNaN(cantidadIngresada)) {
+                    errores.push(`Fila ${index + 1}: La cantidad ingresada no es válida.`);
                 }
         
-                // Si hay errores en esta fila, no agregarla a insumosData
+                // 🔴 Si es un insumo nuevo (manual) y la cantidad es <= 0, mostrar error
+                if (esNuevo && cantidadIngresada <= 0) {
+                    errores.push(`Fila ${index + 1}: No se puede agregar un insumo con cantidad 0 o negativa.`);
+                }
+        
+                // Si hay errores en esta fila, no procesarla
                 if (errores.length > 0) return;
         
                 // Obtener la unidad base del insumo seleccionado
@@ -786,12 +907,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
         
-                // Agregar insumo al array
-                insumosData.push({
-                    insumo_id: parseInt(insumoId),
-                    cantidad: cantidadConvertida,
-                    unidad_medida: unidadBase
-                });
+                if (!esNuevo && cantidadIngresada === 0) {
+                    // ✅ Si el insumo viene de la BD y la cantidad es 0 → Agregar a eliminar
+                    insumosEliminar.push({
+                        insumo_id: parseInt(insumoId)
+                    });
+                } else {
+                    // ✅ Si es nuevo o modificado y cantidad > 0 → Agregar a actualizar
+                    insumosActualizar.push({
+                        insumo_id: parseInt(insumoId),
+                        cantidad: cantidadConvertida,
+                        unidad_medida: unidadBase
+                    });
+                }
             });
         
             // Si hay errores, mostrar alerta y cancelar envío
@@ -800,21 +928,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
         
-            if (insumosData.length === 0) {
-                alert("No hay insumos válidos para agregar.");
+            // Si no hay insumos para actualizar ni eliminar, mostrar alerta
+            if (insumosActualizar.length === 0 && insumosEliminar.length === 0) {
+                alert("No hay cambios para guardar.");
                 return;
             }
         
-            // Enviar datos al backend con un PUT request
             try {
-                const response = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(insumosData)
-                });
+                // **Enviar datos de actualización**
+                if (insumosActualizar.length > 0) {
+                    const responseUpdate = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(insumosActualizar)
+                    });
         
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.error || "Error al actualizar receta");
+                    if (!responseUpdate.ok) throw new Error("Error al actualizar insumos.");
+                }
+        
+                // **Enviar datos de eliminación**
+                for (const insumo of insumosEliminar) {
+                    const responseDelete = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}/${insumo.insumo_id}`, {
+                        method: "DELETE"
+                    });
+        
+                    if (!responseDelete.ok) throw new Error(`Error al eliminar insumo ID: ${insumo.insumo_id}`);
+                }
         
                 alert("✅ Receta actualizada correctamente.");
             } catch (error) {
@@ -822,6 +961,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("❌ Hubo un problema al actualizar la receta.");
             }
         }
+        
         
         
         

@@ -115,18 +115,20 @@ def get_recetas():
         return jsonify([dict(row) for row in recetas])
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener recetas"}), 500
+
+
+#fetch de insumo-recetas
     
-# Leer insumos de una receta específica
 @app.route('/api/receta_insumos/<int:receta_id>', methods=['GET'])
 def get_receta_insumos(receta_id):
     conn = get_db_connection()
     if conn is None:
         return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
-    
+
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT i.nombre, ri.cantidad, i.unidad_medida 
+            SELECT i.nombre AS insumo, ri.cantidad, i.unidad_medida
             FROM receta_insumos ri
             JOIN insumos i ON ri.insumo_id = i.id
             WHERE ri.receta_id = ?
@@ -134,10 +136,34 @@ def get_receta_insumos(receta_id):
         
         insumos = cursor.fetchall()
         conn.close()
-        
-        return jsonify([dict(row) for row in insumos])
+
+        if not insumos:
+            return jsonify([])  # Si la receta no tiene insumos, devolvemos una lista vacía
+
+        return jsonify([dict(row) for row in insumos])  # Convertimos a JSON
+
     except sqlite3.Error as e:
-        return jsonify({"error": "Error al obtener insumos de la receta"}), 500
+        return jsonify({"error": "Error al obtener los insumos de la receta"}), 500
+    
+#Delete de insumo-receta
+@app.route('/api/receta_insumos/<int:receta_id>/<int:insumo_id>', methods=['DELETE'])
+def eliminar_receta_insumo(receta_id, insumo_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM receta_insumos WHERE receta_id = ? AND insumo_id = ?", (receta_id, insumo_id))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Insumo eliminado correctamente"}), 200
+
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al eliminar el insumo"}), 500
+
+
     
 #Agregar insumo-receta
 # Conversión de unidades (kg ↔ g, lt ↔ ml)
