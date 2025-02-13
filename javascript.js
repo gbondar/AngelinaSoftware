@@ -11,6 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const insumoRecetaContainer = document.getElementById("insumoRecetaContainer");
     const btnAgregarNuevoInsumo = document.getElementById("btnAgregarNuevoInsumo");
     const btnAceptarModifInsumo = document.getElementById("btnAceptarModifInsumo");
+    const floatingButton = document.getElementById("floatingButton");
+    const floatingMenu = document.getElementById("floatingMenu");
+    const overlay = document.getElementById("overlay");
+    const btnAgregarInsumosRecetas = document.getElementById("btnAgregarInsumosRecetas");
     
     
 
@@ -25,8 +29,26 @@ document.addEventListener("DOMContentLoaded", () => {
     addModalRecetas.style.display = "none";
     modifModalRecetas.style.display = "none";
     modifInsumosRecetaModal.style.display = "none";
-    document.getElementById("floatingButton").style.display = "flex";
+    //document.getElementById("btnAgregarInsumosRecetas").style.display = "flex";
 
+  // Alternar visibilidad del menú al tocar el "+"
+    floatingButton.addEventListener("click", (event) => {
+        event.stopPropagation(); // Evita que se cierre inmediatamente al abrir
+        floatingMenu.style.display = (floatingMenu.style.display === "block") ? "none" : "block";
+    });
+
+    // Cerrar el menú al hacer clic fuera de él y del botón
+    document.addEventListener("click", (event) => {
+        if (!floatingButton.contains(event.target) && !floatingMenu.contains(event.target)) {
+            floatingMenu.style.display = "none";
+        }
+    });
+
+    // Al tocar la opción, abrir el modal y cerrar el menú
+    btnAgregarInsumosRecetas.addEventListener("click", () => {
+        document.getElementById("modifInsumosRecetaModal").style.display = "flex";
+        floatingMenu.style.display = "none";
+    });
      /*
     elimModalRecetas.style.display = "none";
     
@@ -449,7 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Click para abrir el modal de modificar insumo-receta
-    document.getElementById("floatingButton").addEventListener("click", function() {
+    document.getElementById("btnAgregarInsumosRecetas").addEventListener("click", function() {
         document.getElementById("modifInsumosRecetaModal").style.display = "flex";
         cargarRecetas();
     });
