@@ -378,6 +378,7 @@ label[for="recetaSelect"] {
 
 /* Estilo del texto en el menú (sin botón) */
 .floating-menu button {
+    font-family: 'Roboto', sans-serif;
     font-size: 22px;
     color: white;
     cursor: pointer;
@@ -392,6 +393,60 @@ label[for="recetaSelect"] {
 .floating-menu p:hover {
     color: #9c27b0; /* Violeta más claro */
 }
+
+/* Modal de Ventas */
+#modalVentas .modal-content {
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+}
+
+/* Filtro de Fechas */
+.filtro-fechas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filtro-fechas label {
+    font-weight: bold;
+}
+
+.filtro-fechas input {
+    padding: 8px;
+    font-size: 16px;
+    width: 50%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Tabla de Ventas */
+.ventas-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    color: black;
+}
+
+.ventas-table th, .ventas-table td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+}
+
+.ventas-table th {
+    background-color: #dec26c;
+    font-weight: bold;
+}
+
+.ventas-table tfoot td {
+    font-size: 18px;
+    font-weight: bold;
+}
+
 
 
 /* Responsive para pantallas menores a 820px */

@@ -427,6 +427,38 @@ def agregar_insumo_a_receta():
     except sqlite3.Error as e:
         print("Error al agregar insumo a receta:", e)
         return jsonify({"error": "Error en la base de datos"}), 500
+    
+#Fetch para ventas   
+@app.route('/api/ventas', methods=['GET'])
+def get_ventas():
+    desde = request.args.get('desde')
+    hasta = request.args.get('hasta')
+
+    if not desde or not hasta:
+        return jsonify({"error": "Debe proporcionar un rango de fechas válido"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT v.fecha_venta, r.nombre AS producto, dv.unidades AS cantidad, dv.precio_venta 
+            FROM ventas v
+            JOIN detalle_ventas dv ON v.id = dv.venta_id
+            JOIN recetas r ON dv.receta_id = r.id
+            WHERE v.fecha_venta BETWEEN ? AND ?
+            ORDER BY v.fecha_venta DESC
+        """, (desde, hasta))
+        
+        ventas = cursor.fetchall()
+        conn.close()
+
+        return jsonify([dict(row) for row in ventas])
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al obtener las ventas"}), 500
+
 
 
 if __name__ == '__main__':

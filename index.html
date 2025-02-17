@@ -232,8 +232,49 @@
 
     <!-- Menú flotante -->
     <div id="floatingMenu" class="floating-menu">
-        <button id="btnAgregarInsumosRecetas">Agregar insumos a recetas</button>
+        <button id="btnAgregarInsumosRecetas">Agregar Insumos a Recetas</button>
     </div>
+
+
+    <!-- Modal de Ventas -->
+    <div id="modalVentas" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalVentas">&times;</span>
+            <h2>Ventas</h2>
+
+            <!-- Filtros de fecha -->
+            <div class="filtro-fechas">
+                <label for="fechaDesde">Desde:</label>
+                <input type="date" id="fechaDesde">
+                <label for="fechaHasta">Hasta:</label>
+                <input type="date" id="fechaHasta">
+                <button id="btnFiltrarVentas">Filtrar</button>
+            </div>
+
+            <!-- Tabla de Ventas -->
+            <table class="ventas-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="ventasTableBody">
+                    <!-- Las ventas se cargarán dinámicamente -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" style="text-align:right; font-weight:bold;">Total:</td>
+                        <td id="totalVentas">$0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
 
 
 

@@ -13,9 +13,91 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnAceptarModifInsumo = document.getElementById("btnAceptarModifInsumo");
     const floatingButton = document.getElementById("floatingButton");
     const floatingMenu = document.getElementById("floatingMenu");
-    const overlay = document.getElementById("overlay");
-    const btnAgregarInsumosRecetas = document.getElementById("btnAgregarInsumosRecetas");
     
+    const btnAgregarInsumosRecetas = document.getElementById("btnAgregarInsumosRecetas");
+    const modalVentas = document.getElementById("modalVentas");
+    const btnCaja = document.getElementById("btnCaja");
+    const closeModalVentas = document.getElementById("closeModalVentas");
+    const fechaDesde = document.getElementById("fechaDesde");
+    const fechaHasta = document.getElementById("fechaHasta");
+    const btnFiltrarVentas = document.getElementById("btnFiltrarVentas");
+    const ventasTableBody = document.getElementById("ventasTableBody");
+    const totalVentas = document.getElementById("totalVentas");
+
+    //TODO ESTO ES MODULO VENTAS
+
+    // ✅ Establecer fechas por defecto al día actual
+    const hoy = new Date().toISOString().split("T")[0];
+    fechaDesde.value = hoy;
+    fechaHasta.value = hoy;
+
+    // ✅ Abrir el modal de ventas
+    btnCaja.addEventListener("click", () => {
+        modalVentas.style.display = "flex";
+        cargarVentas(hoy, hoy); // Cargar ventas del día actual
+    });
+
+    // ✅ Cerrar modal de ventas
+    closeModalVentas.addEventListener("click", () => {
+        modalVentas.style.display = "none";
+    });
+
+    // ✅ Filtrar ventas según la fecha
+    btnFiltrarVentas.addEventListener("click", () => {
+        const desde = fechaDesde.value;
+        const hasta = fechaHasta.value;
+        cargarVentas(desde, hasta);
+    });
+
+    // ✅ Función para obtener y mostrar ventas según fecha
+    async function cargarVentas(desde, hasta) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/ventas?desde=${desde}&hasta=${hasta}`);
+            if (!response.ok) throw new Error("Error al obtener ventas");
+
+            const ventas = await response.json();
+            renderVentasTable(ventas);
+        } catch (error) {
+            console.error("Error cargando ventas:", error);
+            alert("Error al cargar ventas.");
+        }
+    }
+
+    // ✅ Función para renderizar la tabla de ventas
+    function renderVentasTable(ventas) {
+        ventasTableBody.innerHTML = ""; // Limpiar tabla antes de agregar nuevas ventas
+        let total = 0;
+
+        // Mostrar 6 filas vacías si no hay datos
+        if (ventas.length === 0) {
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td colspan="5" style="text-align:center;">-</td>`;
+                ventasTableBody.appendChild(row);
+            }
+        } else {
+            ventas.forEach(venta => {
+                const row = document.createElement("tr");
+                const totalVenta = venta.cantidad * venta.precio_unitario;
+                total += totalVenta;
+
+                row.innerHTML = `
+                    <td>${venta.fecha}</td>
+                    <td>${venta.producto}</td>
+                    <td>${venta.cantidad}</td>
+                    <td>$${venta.precio_unitario.toFixed(2)}</td>
+                    <td>$${totalVenta.toFixed(2)}</td>
+                `;
+
+                ventasTableBody.appendChild(row);
+            });
+        }
+
+        // ✅ Actualizar total de ventas
+        totalVentas.textContent = `$${total.toFixed(2)}`;
+    }
+    //FIN MODULO VENTAS
+
     
 
     // Asegurar que los modales inicien cerrados
@@ -29,7 +111,10 @@ document.addEventListener("DOMContentLoaded", () => {
     addModalRecetas.style.display = "none";
     modifModalRecetas.style.display = "none";
     modifInsumosRecetaModal.style.display = "none";
+    modalVentas.style.display = "none";
     //document.getElementById("btnAgregarInsumosRecetas").style.display = "flex";
+
+
 
   // Alternar visibilidad del menú al tocar el "+"
     floatingButton.addEventListener("click", (event) => {
