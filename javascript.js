@@ -26,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const verVenta = document.getElementById('verVenta');
     const addVenta = document.getElementById('addVenta');
     const btnAgregarVenta = document.getElementById("btnAgregarVenta");
+    const btnAgregarDetalle = document.getElementById("btnAgregarDetalle");
+    const ventaTableBody = document.getElementById("ventaTableBody");
+    btnAgregarDetalle.addEventListener("click", agregarVentaATabla);
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
@@ -151,8 +154,75 @@ document.addEventListener("DOMContentLoaded", () => {
     
     //MODULO AGREGAR NUEVA VENTA DENTRO MODULO VENTAS
     btnAgregarVenta.addEventListener("click", () => {
+        limpiarYPrepararVenta();
+        cargarRecetasyPrecio()
         addVenta.style.display = "flex";
+
     });
+
+
+    // ✅ Función para agregar una venta a la tabla
+    function agregarVentaATabla() {
+        // Obtener valores de los inputs
+        const recetaId = document.getElementById("recetaVenta").value;
+        const recetaNombres = document.getElementById("recetaVenta").options[document.getElementById("recetaVenta").selectedIndex].text;
+        const cantidad = parseFloat(document.getElementById("cantidadVenta").value);
+        const precio = parseFloat(document.getElementById("precioVenta").value);
+        const ventaTableBody = document.getElementById("ventaTableBody");
+
+        // Validaciones
+        if (!recetaId || isNaN(cantidad) || isNaN(precio) || cantidad <= 0 || precio <= 0) {
+            alert("Por favor, completa todos los campos con valores válidos.");
+            return;
+        }
+
+        // Calcular subtotal
+        const subtotal = cantidad * precio;
+
+        // Crear una nueva fila para la tabla
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${recetaNombres}</td>
+            <td>${cantidad}</td>
+            <td>$${precio.toFixed(2)}</td>
+            <td class="subtotal-cell">
+                $${subtotal.toFixed(2)}
+            </td>
+        `;
+
+        // Agregar fila a la tabla
+        ventaTableBody.appendChild(row);
+
+        // Limpiar los campos después de agregar
+        limpiarCamposVenta();
+    }
+
+        
+    
+    
+    // Función para limpiar los inputs después de agregar una venta
+    function limpiarCamposVenta() {
+        document.getElementById("recetaVenta").value = "";
+        document.getElementById("cantidadVenta").value = "";
+        document.getElementById("precioVenta").value = "";
+    }
+
+    // ✅ Función que limpia el modal antes de abrirlo
+    function limpiarYPrepararVenta() {
+        document.getElementById("recetaVenta").value = "";
+        document.getElementById("cantidadVenta").value = "";
+        document.getElementById("precioVenta").value = "";
+        document.getElementById("medioVenta").value = ""; // Resetea el select
+        document.getElementById("nombreCliente").value = "";
+        document.getElementById("celularCliente").value = "";
+
+        // ✅ Limpiar la tabla de ventas anteriores
+        document.getElementById("ventaTableBody").innerHTML = "";
+
+        // ✅ Cargar la fecha actual
+        const fechaHoy = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+        document.getElementById("fechaVenta").value = fechaHoy;
+    }
 
     //FIN MODULO VENTAS
     
@@ -223,97 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
               alert(error.message);
           }
       });
-
-    //click de insumos
-    document.getElementById("btnInsumos").addEventListener("click", fetchInsumos);
-
-    //click a agregar insumo
-    document.getElementById("btnAgregarInsumo").addEventListener("click", openAddModal);
-
-    //Click a agregar insumo existente
-    document.getElementById("insumoSelect").addEventListener("change", handleInsumoSelection);
-
-    //click aceptar agregar insumo
-    document.getElementById("btnAddInsumo").addEventListener("click", addInsumo);
-
-    //click cancelar agregar insumo
-    document.getElementById("btnCancelInsumo").addEventListener("click", closeAddModal);
-
-    //click modificar insumo
-    document.getElementById("btnModifInsumo").addEventListener("click", openModifModal);
-
-     //click cancelar agregar insumo
-     document.getElementById("btnmodcancelInsumo").addEventListener("click", closeModifModal);
-
-     // click de abrir eliminar insumo
-     document.getElementById("btnDelInsumo").addEventListener("click", openElimModal);
-    // click de aceptar-eliminar insumo
-    document.getElementById("btneliaceptInsumo").addEventListener("click", Eliminsumo);
-
-    // click de cancelar-eliminar insumo
-    document.getElementById("btnelicancelInsumo").addEventListener("click", closeElimModal);
-
-
-    
-    //click a recetas
-    document.getElementById("btnRecetas").addEventListener("click", fetchRecetas);
-
-    // Click para abrir el modal de agregar receta
-    document.getElementById("btnAgregarReceta").addEventListener("click", function() {
-        document.getElementById("addModalRecetas").style.display = "flex";
-    });
-
-     
-    //click agregar receta
-    document.getElementById("btnAddReceta").addEventListener("click", addReceta);
-
-
-    
-    //click cancelar agregar receta
-    document.getElementById("btnCancelReceta").addEventListener("click", closeAddModalRecetas);
-
-
-    // Click para abrir el modal de modificar receta
-    document.getElementById("btnModifReceta").addEventListener("click", openModifModalRecetas);
-
-    // Click para aceptar la modificación de la receta
-    document.getElementById("btnModifRecetaAceptar").addEventListener("click", modifyReceta);
-
-    // Click para cancelar la modificación de la receta
-    document.getElementById("btnModifRecetaCancelar").addEventListener("click", closeModifModalRecetas);
-
-    //click eliminar receta
-    document.getElementById("btnDelReceta").addEventListener("click", openElimModalRecetas);
-    //click aceptar eliminar receta
-    document.getElementById("btnEliAceptReceta").addEventListener("click", deleteReceta);
-    //click cancelar eliminar receta
-    document.getElementById("btnEliCancelReceta").addEventListener("click", closeElimModalRecetas);
-
-
-    // Agregar eventos a las cruces de los modales
-    document.getElementById("closeModal").addEventListener("click", closeModal);
-    document.getElementById("closeAddModal").addEventListener("click", closeAddModal);
-    document.getElementById("closeModifModal").addEventListener("click", closeModifModal);
-    document.getElementById("closeElimModal").addEventListener("click", closeElimModal);
-    document.getElementById("closeModalRecetas").addEventListener("click", closeModalRecetas);
-
-    document.getElementById("closeAddModalRecetas").addEventListener("click", closeAddModalRecetas);
-
-    document.getElementById("closeModifModalRecetas").addEventListener("click", closeModifModalRecetas);
-    document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
-    document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
-    document.getElementById('closeVerVenta').addEventListener('click',closeVerVenta);
-    document.getElementById('closeaddVenta').addEventListener('click',closeaddVenta);
-    
-    
-
-    
-   
-    
-
-    
-    
-    
 
 
     //funciones de lectura en la bbdd 
@@ -676,6 +655,49 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    document.addEventListener("DOMContentLoaded", () => {
+        cargarRecetas();
+    });
+    
+    async function cargarRecetasyPrecio() {
+        try {
+            const response = await fetch("http://localhost:5000/api/recetas");
+            if (!response.ok) throw new Error("Error al obtener recetas");
+
+            
+    
+            const recetas = await response.json();
+            const selectReceta = document.getElementById("recetaVenta");
+
+            // ✅ Limpiar opciones previas antes de cargar nuevas recetas
+            selectReceta.innerHTML = '<option value="">Selecciona una opción</option>';
+    
+            recetas.forEach(receta => {
+                const option = document.createElement("option");
+                option.value = receta.id;
+                option.textContent = receta.nombre;
+                option.dataset.precio = receta.precio_venta; // Guardamos el precio en el atributo dataset
+                selectReceta.appendChild(option);
+            });
+    
+            // Evento para cambiar el precio cuando se selecciona una receta
+            selectReceta.addEventListener("change", () => {
+                const selectedOption = selectReceta.options[selectReceta.selectedIndex];
+                const precioVenta = document.getElementById("precioVenta");
+    
+                if (selectedOption.value) {
+                    precioVenta.value = Math.round(selectedOption.dataset.precio);
+                } else {
+                    precioVenta.value = ""; // Si no hay selección, vacía el campo de precio
+                }
+            });
+    
+        } catch (error) {
+            console.error("Error cargando recetas:", error);
+        }
+    }
+    
+
 
     // Click para abrir el modal de modificar insumo-receta
     document.getElementById("btnAgregarInsumosRecetas").addEventListener("click", function() {
@@ -740,9 +762,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("modifModalRecetas").style.display = "none";
     }
     
-    function closeaddVenta() {
-        document.getElementById("addVenta").style.display = "none";
-    }
+  
 
     function openElimModal() {
         if (!window.selectedInsumo) {
@@ -1516,6 +1536,93 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(error.message);
         });
     }
+
+       //click de insumos
+    document.getElementById("btnInsumos").addEventListener("click", fetchInsumos);
+
+    //click a agregar insumo
+    document.getElementById("btnAgregarInsumo").addEventListener("click", openAddModal);
+
+    //Click a agregar insumo existente
+    document.getElementById("insumoSelect").addEventListener("change", handleInsumoSelection);
+
+    //click aceptar agregar insumo
+    document.getElementById("btnAddInsumo").addEventListener("click", addInsumo);
+
+    //click cancelar agregar insumo
+    document.getElementById("btnCancelInsumo").addEventListener("click", closeAddModal);
+
+    //click modificar insumo
+    document.getElementById("btnModifInsumo").addEventListener("click", openModifModal);
+
+     //click cancelar agregar insumo
+     document.getElementById("btnmodcancelInsumo").addEventListener("click", closeModifModal);
+
+     // click de abrir eliminar insumo
+     document.getElementById("btnDelInsumo").addEventListener("click", openElimModal);
+    // click de aceptar-eliminar insumo
+    document.getElementById("btneliaceptInsumo").addEventListener("click", Eliminsumo);
+
+    // click de cancelar-eliminar insumo
+    document.getElementById("btnelicancelInsumo").addEventListener("click", closeElimModal);
+
+
+    
+    //click a recetas
+    document.getElementById("btnRecetas").addEventListener("click", fetchRecetas);
+
+    // Click para abrir el modal de agregar receta
+    document.getElementById("btnAgregarReceta").addEventListener("click", function() {
+        document.getElementById("addModalRecetas").style.display = "flex";
+    });
+
+     
+    //click agregar receta
+    document.getElementById("btnAddReceta").addEventListener("click", addReceta);
+
+
+    
+    //click cancelar agregar receta
+    document.getElementById("btnCancelReceta").addEventListener("click", closeAddModalRecetas);
+
+
+    // Click para abrir el modal de modificar receta
+    document.getElementById("btnModifReceta").addEventListener("click", openModifModalRecetas);
+
+    // Click para aceptar la modificación de la receta
+    document.getElementById("btnModifRecetaAceptar").addEventListener("click", modifyReceta);
+
+    // Click para cancelar la modificación de la receta
+    document.getElementById("btnModifRecetaCancelar").addEventListener("click", closeModifModalRecetas);
+
+    //click eliminar receta
+    document.getElementById("btnDelReceta").addEventListener("click", openElimModalRecetas);
+    //click aceptar eliminar receta
+    document.getElementById("btnEliAceptReceta").addEventListener("click", deleteReceta);
+    //click cancelar eliminar receta
+    document.getElementById("btnEliCancelReceta").addEventListener("click", closeElimModalRecetas);
+
+
+    // Agregar eventos a las cruces de los modales
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("closeAddModal").addEventListener("click", closeAddModal);
+    document.getElementById("closeModifModal").addEventListener("click", closeModifModal);
+    document.getElementById("closeElimModal").addEventListener("click", closeElimModal);
+    document.getElementById("closeModalRecetas").addEventListener("click", closeModalRecetas);
+
+    document.getElementById("closeAddModalRecetas").addEventListener("click", closeAddModalRecetas);
+
+    document.getElementById("closeModifModalRecetas").addEventListener("click", closeModifModalRecetas);
+    document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
+    document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
+    document.getElementById('closeVerVenta').addEventListener('click',closeVerVenta);
+
+    function closeaddVenta() {
+        document.getElementById("addVenta").style.display = "none";
+    }
+    document.getElementById('closeaddVenta').addEventListener('click',closeaddVenta);
+    
+    
     
     document.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
@@ -1538,7 +1645,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-    
     
     
     //Cierra al tocar afuera de los modals

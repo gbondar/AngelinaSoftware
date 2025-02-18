@@ -347,7 +347,10 @@
                     <h2>Venta</h2>
                     <form id="addDetalleForm">
                         <label for="recetaVenta">Receta:</label>
-                        <input type="text" id="recetaVenta">
+                        <select id="recetaVenta" required>
+                            <option value="">Selecciona una receta</option>
+                        </select>
+
                         
                         <label for="cantidadVenta">Cantidad:</label>
                         <input type="number" id="cantidadVenta">
@@ -364,7 +367,7 @@
 
             <!-- Tabla de Detalles de la Venta -->
             <div class="tabla-ventas-container">
-                <table class="ventas-table">
+                <table class="detalle-table">
                     <thead>
                         <tr>
                             <th>Producto</th>
