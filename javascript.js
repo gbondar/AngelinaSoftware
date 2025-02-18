@@ -24,6 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const ventasTableBody = document.getElementById("ventasTableBody");
     const totalVentas = document.getElementById("totalVentas");
     const verVenta = document.getElementById('verVenta');
+    const addVenta = document.getElementById('addVenta');
+    const btnAgregarVenta = document.getElementById("btnAgregarVenta");
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
@@ -146,8 +148,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // ✅ Actualizar total de ventas
         totalVentas.textContent = `$${total.toFixed(2)}`;
     }
-    //FIN MODULO VENTAS
+    
+    //MODULO AGREGAR NUEVA VENTA DENTRO MODULO VENTAS
+    btnAgregarVenta.addEventListener("click", () => {
+        addVenta.style.display = "flex";
+    });
 
+    //FIN MODULO VENTAS
     
 
     // Asegurar que los modales inicien cerrados
@@ -162,6 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modifModalRecetas.style.display = "none";
     modifInsumosRecetaModal.style.display = "none";
     modalVentas.style.display = "none";
+    addVenta.style.display = "none";
     
     //document.getElementById("btnAgregarInsumosRecetas").style.display = "flex";
 
@@ -295,6 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
     document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
     document.getElementById('closeVerVenta').addEventListener('click',closeVerVenta);
+    document.getElementById('closeaddVenta').addEventListener('click',closeaddVenta);
+    
     
 
     
@@ -730,6 +740,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("modifModalRecetas").style.display = "none";
     }
     
+    function closeaddVenta() {
+        document.getElementById("addVenta").style.display = "none";
+    }
 
     function openElimModal() {
         if (!window.selectedInsumo) {

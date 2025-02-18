@@ -447,6 +447,86 @@ label[for="recetaSelect"] {
     font-weight: bold;
 }
 
+.ventas-buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.add-btn, .delete-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px; /* Cuadrado con bordes ligeramente redondeados */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.add-btn:hover {
+    background-color: #45a049;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilo para agrandar el modal */
+.modal-content-wide {
+    position: relative;
+    background-color: #e6d190;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1200px; /* Hace que ocupe casi toda la pantalla */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+}
+
+/* Contenedor principal con dos columnas */
+.venta-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+/* Sección izquierda: Datos Cliente */
+.datos-cliente {
+    width: 40%;
+    background: #e6d190;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Sección derecha: Nueva Venta */
+.venta-detalles {
+    width: 60%;
+    background: #e6d190;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+
 
 
 /* Responsive para pantallas menores a 820px */

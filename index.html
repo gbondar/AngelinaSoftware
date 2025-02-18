@@ -251,6 +251,12 @@
                 <button id="btnFiltrarVentas">Filtrar</button>
             </div>
 
+            <!-- Botones de acciones arriba de la tabla -->
+            <div class="ventas-buttons">
+                <button id="btnAgregarVenta" class="add-btn">+</button>
+                <button id="btnEliminarVenta" class="delete-btn">🗑️</button>
+            </div>
+
             <!-- Tabla de Ventas -->
             <table class="ventas-table">
                 <thead>
@@ -272,6 +278,8 @@
             </table>
         </div>
     </div>
+
+
 
     <!-- Modal de ver detalle-venta -->
     <div id="verVenta" class="modal">
@@ -299,6 +307,86 @@
             </table>
         </div>
     </div>
+
+
+    <!-- Modal de Nueva Venta -->
+    <div id="addVenta" class="modal">
+        <div class="modal-content-wide">
+            <span class="close-button" id="closeaddVenta" onclick="closeaddVenta()">&times;</span>
+            
+            <div class="venta-container">
+                <!-- Sección Izquierda: Datos del Cliente -->
+                <div class="datos-cliente">
+                    <h2>Cliente</h2>
+                    <form id="addClientesForm">
+                        <label for="nombreCliente">Nombre:</label>
+                        <input type="text" id="nombreCliente">
+                        
+                        <label for="celularCliente">Celular:</label>
+                        <input type="number" id="celularCliente">
+                    </form>
+                    <h2>Info</h2>
+                    <form id="addVentasForm">
+                        <label for="fechaVenta">Fecha Venta:</label>
+                        <input type="date" id="fechaVenta">
+                        
+                        <label for="medioVenta">Medio de venta:</label>
+                        <select id="medioVenta" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="PedidosYa">Pedidos Ya</option>
+                            <option value="Presencial">Presencial</option>
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Sección Derecha: Nueva Venta -->
+                <div class="venta-detalles">
+                    <!-- Sección de Productos -->
+                    <h2>Venta</h2>
+                    <form id="addDetalleForm">
+                        <label for="recetaVenta">Receta:</label>
+                        <input type="text" id="recetaVenta">
+                        
+                        <label for="cantidadVenta">Cantidad:</label>
+                        <input type="number" id="cantidadVenta">
+
+                        <label for="precioVenta">Precio:</label>
+                        <input type="number" id="precioVenta">
+                    </form>
+
+                    <div class="modal-buttons">
+                        <button type="button" id="btnAgregarDetalle">Agregar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Detalles de la Venta -->
+            <div class="tabla-ventas-container">
+                <table class="ventas-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ventaTableBody">
+                        <!-- Se agregarán los productos dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botón Aceptar al Final -->
+            <div class="modal-buttons">
+                <button type="button" id="btnAceptarDetalle">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+
 
 
     <script src="javascript.js"></script>
