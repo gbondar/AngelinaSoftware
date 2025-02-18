@@ -120,7 +120,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // ✅ Evento para abrir verVenta() al hacer doble clic
                 row.addEventListener("dblclick", () => {
-                    verVentas(venta);  // Llamar a verVenta pasando la venta seleccionada
+                    const ventaId = venta.venta_id; // Obtener el venta_id almacenado
+                    verVentas(ventaId);  // Llamar a verVentas pasando el venta_id
                 });
 
                 
@@ -366,9 +367,60 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('verVenta').style.display = "none";
     }
 
-    function verVentas(){
-        document.getElementById('verVenta').style.display = "flex";
+    
+
+    async function verVentas(ventaId) {
+        try {
+            const response = await fetch(`http://localhost:5000/api/detalle_ventas?venta_id=${ventaId}`);
+            if (!response.ok) throw new Error("Error al obtener los detalles de la venta");
+    
+            const detalles = await response.json();
+            mostrarDetallesVenta(detalles, ventaId);
+        } catch (error) {
+            console.error("Error cargando detalles de venta:", error);
+            alert("Error al cargar los detalles de la venta.");
+        }
     }
+    
+
+    function mostrarDetallesVenta(detalles) {
+        const detallesContainer = document.getElementById("detallesTableBody");
+        const totalDetVentas = document.getElementById("totalDetVentas"); // Elemento donde se muestra el total general
+    
+        detallesContainer.innerHTML = ""; // Limpiar antes de agregar nuevos datos
+    
+        let total = 0; // Inicializa el total
+    
+        if (detalles.length === 0) {
+            detallesContainer.innerHTML = `<tr><td colspan="4" style="text-align:center;">No hay detalles disponibles.</td></tr>`;
+        } else {
+            detalles.forEach(detalle => {
+                const row = document.createElement("tr");
+    
+                row.innerHTML = `
+                    <td>${detalle.receta_nombre}</td>
+                    <td>${detalle.unidades}</td>
+                    <td>$${detalle.precio_venta.toFixed(2)}</td>
+                    <td>$${detalle.subtotal.toFixed(2)}</td>
+                `;
+    
+                detallesContainer.appendChild(row);
+                total += detalle.subtotal; // ✅ Sumar el subtotal al total general
+            });
+    
+            // ✅ Actualiza solo el contenido de `totalDetVentas`, sin tocar el `tfoot`
+            if (totalDetVentas) {
+                totalDetVentas.innerHTML = `<strong>$${total.toFixed(2)}</strong>`;
+            }
+            
+        }
+    
+        // ✅ Asegurar que el modal de detalles de venta se muestra
+        document.getElementById("verVenta").style.display = "flex";
+    }
+    
+    
+    
 
 
     

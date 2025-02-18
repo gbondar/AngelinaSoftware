@@ -449,9 +449,10 @@ def get_ventas():
     try:
         cursor = conn.cursor()
 
-        # 🔹 Nueva consulta con suma de unidades y total de la venta
+        # 🔹 Nueva consulta incluyendo `v.id` como `venta_id`
         cursor.execute("""
-            SELECT v.fecha_venta, 
+            SELECT v.id AS venta_id,  -- ✅ Se incluye el ID de la venta
+                   v.fecha_venta, 
                    SUM(dv.unidades) AS unidades_totales, 
                    SUM(dv.subtotal) AS total
             FROM ventas v
@@ -467,8 +468,8 @@ def get_ventas():
         # 🔹 Transformar los resultados en una lista de diccionarios con formato de fecha
         ventas_list = []
         for row in ventas:
-            
             ventas_list.append({
+                "venta_id": row["venta_id"],  # ✅ Ahora se devuelve el ID de la venta
                 "fecha": row["fecha_venta"],
                 "unidades_totales": row["unidades_totales"],
                 "total": row["total"]
@@ -477,6 +478,31 @@ def get_ventas():
         return jsonify(ventas_list)
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener las ventas"}), 500
+
+    
+#Get para ventas 2
+    
+@app.route('/api/detalle_ventas', methods=['GET'])
+def get_detalle_ventas():
+    venta_id = request.args.get('venta_id')
+
+    if not venta_id:
+        return jsonify({"error": "Se requiere un venta_id"}), 400
+
+    try:
+        conn = get_db_connection()
+        detalles = conn.execute("""
+            SELECT dv.receta_id, r.nombre AS receta_nombre, dv.unidades, dv.precio_venta, dv.subtotal
+            FROM detalle_ventas dv
+            JOIN recetas r ON dv.receta_id = r.id
+            WHERE dv.venta_id = ?;
+        """, (venta_id,)).fetchall()
+        conn.close()
+
+        return jsonify([dict(row) for row in detalles])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 
