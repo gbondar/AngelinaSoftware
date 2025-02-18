@@ -503,7 +503,37 @@ def get_detalle_ventas():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+#Agregar nueva venta a tabla ventas
+@app.route('/api/ventas', methods=['POST'])
+def agregar_venta():
+    data = request.json  # Recibe los datos en formato JSON
 
+    fecha_venta = data.get("fecha_venta")
+    medio_venta = data.get("medio_venta")
+    total_venta = data.get("total_venta")
+
+    if not fecha_venta or not medio_venta or total_venta is None:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Insertar la nueva venta en la tabla `ventas`
+        cursor.execute("""
+            INSERT INTO ventas (fecha_venta, medio_venta, total)
+            VALUES (?, ?, ?)
+        """, (fecha_venta, medio_venta, total_venta))
+
+        conn.commit()
+        venta_id = cursor.lastrowid  # Obtener el ID de la venta insertada
+        conn.close()
+
+        return jsonify({"message": "Venta agregada exitosamente", "venta_id": venta_id}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al insertar la venta"}), 500
+    
 
 
 

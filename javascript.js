@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnAgregarDetalle = document.getElementById("btnAgregarDetalle");
     const ventaTableBody = document.getElementById("ventaTableBody");
     btnAgregarDetalle.addEventListener("click", agregarVentaATabla);
+    const fechaVenta = document.getElementById('fechaVenta');
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
@@ -223,6 +224,66 @@ document.addEventListener("DOMContentLoaded", () => {
         const fechaHoy = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
         document.getElementById("fechaVenta").value = fechaHoy;
     }
+
+
+    //FUNCIONES DE ENVIAR AL BACKEND EN NUEVA VENTA
+
+    async function enviarVenta() {
+        const fechaVenta = document.getElementById("fechaVenta").value;
+        const medioVenta = document.getElementById("medioVenta").value;
+        const ventaTableBody = document.getElementById("ventaTableBody").querySelectorAll("tr");
+    
+        let totalVenta = 0;
+    
+        // Recorrer las filas de la tabla y sumar los subtotales
+        ventaTableBody.forEach(row => {
+            const subtotalText = row.querySelector(".subtotal-cell").textContent.trim().replace("$", "");
+            const subtotal = parseFloat(subtotalText);
+            if (!isNaN(subtotal)) {
+                totalVenta += subtotal;
+            }
+        });
+    
+        // Validar que haya datos suficientes para enviar
+        if (!fechaVenta || !medioVenta || totalVenta === 0) {
+            alert("Faltan datos para completar la venta.");
+            return;
+        }
+    
+        // Crear el objeto con los datos a enviar
+        const data = {
+            fecha_venta: fechaVenta,
+            medio_venta: medioVenta,
+            total_venta: totalVenta
+        };
+    
+        try {
+            const response = await fetch("http://localhost:5000/api/ventas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                alert("Venta registrada con éxito.");
+                console.log("Venta creada:", result);
+            } else {
+                alert("Error al registrar la venta.");
+                console.error("Error:", result);
+            }
+    
+        } catch (error) {
+            console.error("Error en la petición:", error);
+        }
+    }
+    
+    // ✅ Asignar evento al botón "Aceptar"
+    document.getElementById("btnAceptarDetalle").addEventListener("click", enviarVenta);
+    
 
     //FIN MODULO VENTAS
     
