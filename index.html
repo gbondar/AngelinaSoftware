@@ -202,7 +202,7 @@
             </div>
         </div>
     </div>
-    <script src="javascript.js"></script>
+    
 
     <!-- Modal de Modificar Insumos en Receta -->
     <div id="modifInsumosRecetaModal" class="modal">
@@ -273,8 +273,35 @@
         </div>
     </div>
 
+    <!-- Modal de ver detalle-venta -->
+    <div id="verVenta" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeVerVenta" onclick="closeVerVenta()">&times;</span>
+            <h2>Detalle Venta</h2>
+            <table class="recetas-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="detallesTableBody">
+                    <!-- Las ventas se cargarán dinámicamente -->
+                </tbody>
+                <tfoot id="detallesTableFooter">
+                    <tr>
+                        <td colspan="3" style="text-align:right; font-weight:bold;">Total:</td>
+                        <td id="totalVentas">$0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 
 
+    <script src="javascript.js"></script>
 
 
 

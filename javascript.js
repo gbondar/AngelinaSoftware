@@ -23,8 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnFiltrarVentas = document.getElementById("btnFiltrarVentas");
     const ventasTableBody = document.getElementById("ventasTableBody");
     const totalVentas = document.getElementById("totalVentas");
+    const verVenta = document.getElementById('verVenta');
 
     //TODO ESTO ES MODULO VENTAS
+    verVenta.style.display = "none";
 
     // ✅ Establecer fechas por defecto al día actual
     const hoy = new Date().toISOString().split("T")[0];
@@ -110,6 +112,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${venta.unidades_totales}</td>
                     <td>$${venta.total.toFixed(2)}</td>
                 `;
+                  // ✅ Evento para marcar fila en violeta al hacer clic
+                row.addEventListener("click", () => {
+                    document.querySelectorAll("#ventasTableBody tr").forEach(tr => tr.classList.remove("selected"));
+                    row.classList.add("selected");
+                });
+
+                // ✅ Evento para abrir verVenta() al hacer doble clic
+                row.addEventListener("dblclick", () => {
+                    verVentas(venta);  // Llamar a verVenta pasando la venta seleccionada
+                });
+
+                
     
                 ventasTableBody.appendChild(row);
             });
@@ -147,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modifModalRecetas.style.display = "none";
     modifInsumosRecetaModal.style.display = "none";
     modalVentas.style.display = "none";
+    
     //document.getElementById("btnAgregarInsumosRecetas").style.display = "flex";
 
 
@@ -278,6 +293,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("closeModifModalRecetas").addEventListener("click", closeModifModalRecetas);
     document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
     document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
+    document.getElementById('closeVerVenta').addEventListener('click',closeVerVenta);
+    
 
     
    
@@ -343,6 +360,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeModifInsumosRecetaModal() {
         document.getElementById("modifInsumosRecetaModal").style.display = "none";
         limpiarInsumosAgregados()
+    }
+
+    function closeVerVenta() {
+        document.getElementById('verVenta').style.display = "none";
+    }
+
+    function verVentas(){
+        document.getElementById('verVenta').style.display = "flex";
     }
 
 
