@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import sqlite3
+import datetime
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -428,7 +429,7 @@ def agregar_insumo_a_receta():
         print("Error al agregar insumo a receta:", e)
         return jsonify({"error": "Error en la base de datos"}), 500
     
-#Fetch para ventas   
+# Fetch para ventas   
 @app.route('/api/ventas', methods=['GET'])
 def get_ventas():
     desde = request.args.get('desde')
@@ -437,27 +438,46 @@ def get_ventas():
     if not desde or not hasta:
         return jsonify({"error": "Debe proporcionar un rango de fechas válido"}), 400
 
+    # 🔹 Formatear fechas correctamente para SQLite
+    desde = desde.replace("T", " ")
+    hasta = hasta.replace("T", " ")
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
 
     try:
         cursor = conn.cursor()
+
+        # 🔹 Nueva consulta con suma de unidades y total de la venta
         cursor.execute("""
-            SELECT v.fecha_venta, r.nombre AS producto, dv.unidades AS cantidad, dv.precio_venta 
+            SELECT v.fecha_venta, 
+                   SUM(dv.unidades) AS unidades_totales, 
+                   SUM(dv.subtotal) AS total
             FROM ventas v
             JOIN detalle_ventas dv ON v.id = dv.venta_id
-            JOIN recetas r ON dv.receta_id = r.id
-            WHERE v.fecha_venta BETWEEN ? AND ?
+            WHERE datetime(v.fecha_venta) BETWEEN datetime(?) AND datetime(?)
+            GROUP BY v.id
             ORDER BY v.fecha_venta DESC
         """, (desde, hasta))
-        
+
         ventas = cursor.fetchall()
         conn.close()
 
-        return jsonify([dict(row) for row in ventas])
+        # 🔹 Transformar los resultados en una lista de diccionarios con formato de fecha
+        ventas_list = []
+        for row in ventas:
+            
+            ventas_list.append({
+                "fecha": row["fecha_venta"],
+                "unidades_totales": row["unidades_totales"],
+                "total": row["total"]
+            })
+
+        return jsonify(ventas_list)
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener las ventas"}), 500
+
 
 
 

@@ -52,9 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Función para obtener y mostrar ventas según fecha
     async function cargarVentas(desde, hasta) {
         try {
-            const response = await fetch(`http://localhost:5000/api/ventas?desde=${desde}&hasta=${hasta}`);
+            // Asegurar que la fecha tenga formato correcto
+            const desdeISO = `${desde}T00:00:00`;
+            const hastaISO = `${hasta}T23:59:59`;
+    
+            const response = await fetch(`http://localhost:5000/api/ventas?desde=${desdeISO}&hasta=${hastaISO}`);
             if (!response.ok) throw new Error("Error al obtener ventas");
-
+    
             const ventas = await response.json();
             renderVentasTable(ventas);
         } catch (error) {
@@ -62,36 +66,67 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Error al cargar ventas.");
         }
     }
+    
 
     // ✅ Función para renderizar la tabla de ventas
+    // ✅ Función para renderizar la tabla de ventas con formato nuevo
     function renderVentasTable(ventas) {
-        ventasTableBody.innerHTML = ""; // Limpiar tabla antes de agregar nuevas ventas
+        ventasTableBody.innerHTML = ""; // Limpiar la tabla antes de agregar nuevas ventas
         let total = 0;
-
-        // Mostrar 6 filas vacías si no hay datos
+    
+        // 🔹 Eliminar cualquier total anterior en el tfoot
+        const ventasTableFooter = document.getElementById("ventasTableFooter");
+        if (ventasTableFooter) {
+            ventasTableFooter.innerHTML = ""; // Limpia la fila de total previa
+        }
+    
         if (ventas.length === 0) {
             for (let i = 0; i < 6; i++) {
                 const row = document.createElement("tr");
-                row.innerHTML = `<td colspan="5" style="text-align:center;">-</td>`;
+                row.innerHTML = `<td colspan="3" style="text-align:center;">-</td>`;
                 ventasTableBody.appendChild(row);
             }
         } else {
             ventas.forEach(venta => {
                 const row = document.createElement("tr");
-                const totalVenta = venta.cantidad * venta.precio_unitario;
-                total += totalVenta;
-
+    
+                // ✅ Validar y formatear la fecha
+                let fechaFormateada = "Fecha inválida";
+                if (venta.fecha && !isNaN(Date.parse(venta.fecha))) {
+                    const fechaObj = new Date(venta.fecha);
+                    fechaFormateada = fechaObj.toLocaleString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+                }
+    
+                total += venta.total; // Acumular el total
+    
                 row.innerHTML = `
-                    <td>${venta.fecha}</td>
-                    <td>${venta.producto}</td>
-                    <td>${venta.cantidad}</td>
-                    <td>$${venta.precio_unitario.toFixed(2)}</td>
-                    <td>$${totalVenta.toFixed(2)}</td>
+                    <td>${fechaFormateada}</td>
+                    <td>${venta.unidades_totales}</td>
+                    <td>$${venta.total.toFixed(2)}</td>
                 `;
-
+    
                 ventasTableBody.appendChild(row);
             });
-        }
+        
+    
+        // ✅ Actualizar la fila del total en el `tfoot`
+        ventasTableFooter.innerHTML = `
+            <tr>
+                <td colspan="2" style="text-align:right; font-weight:bold;">Total:</td>
+                <td>$${total.toFixed(2)}</td>
+            </tr>
+        `;
+    
+        // ✅ También actualiza el total en caso de que haya otro elemento que lo use
+        totalVentas.textContent = `$${total.toFixed(2)}`;
+    }
+    
 
         // ✅ Actualizar total de ventas
         totalVentas.textContent = `$${total.toFixed(2)}`;
