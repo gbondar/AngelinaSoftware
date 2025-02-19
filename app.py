@@ -534,6 +534,43 @@ def agregar_venta():
     except sqlite3.Error as e:
         return jsonify({"error": "Error al insertar la venta"}), 500
     
+#Post method para insertar en detalle_ventas
+@app.route('/api/detalle_ventas', methods=['POST'])
+def agregar_detalle_ventas():
+    data = request.json  # Recibe los datos en formato JSON
+
+    venta_id = data.get("venta_id")
+    detalles = data.get("detalles")  # Lista de detalles de la venta
+
+    if not venta_id or not detalles or not isinstance(detalles, list):
+        return jsonify({"error": "Datos incompletos o formato incorrecto"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Insertar cada detalle en la tabla `detalle_ventas`
+        for detalle in detalles:
+            receta_id = detalle.get("receta_id")
+            unidades = detalle.get("unidades")
+            precio_venta = detalle.get("precio_venta")
+
+            if not receta_id or not unidades or not precio_venta:
+                return jsonify({"error": "Datos faltantes en los detalles"}), 400
+
+            cursor.execute("""
+                INSERT INTO detalle_ventas (venta_id, receta_id, unidades, precio_venta)
+                VALUES (?, ?, ?, ?)
+            """, (venta_id, receta_id, unidades, precio_venta))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Detalles de venta agregados exitosamente"}), 201
+
+    except sqlite3.Error as e:
+        return jsonify({"error": "Error al insertar detalles de venta"}), 500
+
 
 
 

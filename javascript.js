@@ -165,8 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Función para agregar una venta a la tabla
     function agregarVentaATabla() {
         // Obtener valores de los inputs
-        const recetaId = document.getElementById("recetaVenta").value;
-        const recetaNombres = document.getElementById("recetaVenta").options[document.getElementById("recetaVenta").selectedIndex].text;
+        const selectReceta = document.getElementById("recetaVenta");
+        const recetaId = selectReceta.value;
+        const recetaNombres = selectReceta.options[selectReceta.selectedIndex].text;
         const cantidad = parseFloat(document.getElementById("cantidadVenta").value);
         const precio = parseFloat(document.getElementById("precioVenta").value);
         const ventaTableBody = document.getElementById("ventaTableBody");
@@ -182,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Crear una nueva fila para la tabla
         const row = document.createElement("tr");
+        row.setAttribute("data-receta-id", recetaId); // ✅ Almacenar el ID de la receta
         row.innerHTML = `
             <td>${recetaNombres}</td>
             <td>${cantidad}</td>
@@ -220,8 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // ✅ Limpiar la tabla de ventas anteriores
         document.getElementById("ventaTableBody").innerHTML = "";
 
-        // ✅ Cargar la fecha actual
-        const fechaHoy = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+        // ✅ Cargar la fecha actual con hora, minutos y segundos
+        const now = new Date();
+        const fechaHoy = now.toISOString().slice(0, 16); // Formato "YYYY-MM-DDTHH:MM"
         document.getElementById("fechaVenta").value = fechaHoy;
     }
 
@@ -234,55 +237,93 @@ document.addEventListener("DOMContentLoaded", () => {
         const ventaTableBody = document.getElementById("ventaTableBody").querySelectorAll("tr");
     
         let totalVenta = 0;
+        let detallesVenta = [];
     
-        // Recorrer las filas de la tabla y sumar los subtotales
+        // Recorrer las filas de la tabla para obtener los detalles de la venta
         ventaTableBody.forEach(row => {
-            const subtotalText = row.querySelector(".subtotal-cell").textContent.trim().replace("$", "");
-            const subtotal = parseFloat(subtotalText);
-            if (!isNaN(subtotal)) {
-                totalVenta += subtotal;
+            console.log("Fila procesada:", row.innerHTML); // ✅ Ver qué hay en la fila
+    
+            const recetaId = row.dataset.recetaId; // Guardar el ID de la receta
+            const cantidad = parseInt(row.cells[1].textContent);
+            const precio = parseFloat(row.cells[2].textContent.replace("$", ""));
+            const subtotal = parseFloat(row.cells[3].textContent.replace("$", ""));
+    
+            console.log(`Procesando detalle - Receta ID: ${recetaId}, Cantidad: ${cantidad}, Precio: ${precio}, Subtotal: ${subtotal}`);
+    
+            if (!recetaId || isNaN(cantidad) || isNaN(precio)) {
+                console.error("❌ Error en detalle: Falta receta_id, cantidad o precio.");
+                return;
             }
+    
+            totalVenta += subtotal;
+    
+            detallesVenta.push({
+                receta_id: recetaId,
+                unidades: cantidad,
+                precio_venta: precio
+            });
         });
     
+        console.log("🛠️ Detalles Venta Enviados:", detallesVenta); // ✅ Verificar antes de enviar
+    
         // Validar que haya datos suficientes para enviar
-        if (!fechaVenta || !medioVenta || totalVenta === 0) {
+        if (!fechaVenta || !medioVenta || totalVenta === 0 || detallesVenta.length === 0) {
             alert("Faltan datos para completar la venta.");
+            console.error("❌ Error: Datos de la venta incompletos.");
             return;
         }
     
-        // Crear el objeto con los datos a enviar
-        const data = {
-            fecha_venta: fechaVenta,
-            medio_venta: medioVenta,
-            total_venta: totalVenta
-        };
-    
+        // ✅ 1. Enviar la venta principal y obtener el `venta_id`
         try {
-            const response = await fetch("http://localhost:5000/api/ventas", {
+            const responseVenta = await fetch("http://localhost:5000/api/ventas", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    fecha_venta: fechaVenta,
+                    medio_venta: medioVenta,
+                    total_venta: totalVenta
+                })
             });
     
-            const result = await response.json();
+            const resultVenta = await responseVenta.json();
     
-            if (response.ok) {
-                alert("Venta registrada con éxito.");
-                console.log("Venta creada:", result);
-            } else {
+            if (!responseVenta.ok) {
+                console.error("❌ Error al registrar la venta:", resultVenta);
                 alert("Error al registrar la venta.");
-                console.error("Error:", result);
+                return;
             }
     
+            const ventaId = resultVenta.venta_id; // ID de la venta recién creada
+    
+            console.log(`✅ Venta creada con ID: ${ventaId}`);
+    
+            // ✅ 2. Enviar los detalles de la venta con `venta_id`
+            const responseDetalles = await fetch("http://localhost:5000/api/detalle_ventas", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ venta_id: ventaId, detalles: detallesVenta })
+            });
+    
+            const resultDetalles = await responseDetalles.json();
+    
+            if (!responseDetalles.ok) {
+                console.error("❌ Error al registrar detalles de venta:", resultDetalles);
+                alert("Error al registrar los detalles de la venta.");
+                return;
+            }
+    
+            alert("✅ Venta y detalles registrados con éxito.");
+            console.log("✅ Detalles de venta agregados:", resultDetalles);
+    
         } catch (error) {
-            console.error("Error en la petición:", error);
+            console.error("❌ Error en la petición:", error);
         }
     }
     
+    
     // ✅ Asignar evento al botón "Aceptar"
     document.getElementById("btnAceptarDetalle").addEventListener("click", enviarVenta);
+    
     
 
     //FIN MODULO VENTAS
