@@ -234,21 +234,19 @@ document.addEventListener("DOMContentLoaded", () => {
     async function enviarVenta() {
         const fechaVenta = document.getElementById("fechaVenta").value;
         const medioVenta = document.getElementById("medioVenta").value;
+        const nombreCliente = document.getElementById("nombreCliente").value.trim();
+        const celularCliente = document.getElementById("celularCliente").value.trim();
         const ventaTableBody = document.getElementById("ventaTableBody").querySelectorAll("tr");
     
         let totalVenta = 0;
         let detallesVenta = [];
     
-        // Recorrer las filas de la tabla para obtener los detalles de la venta
+        // Recorrer la tabla para obtener los detalles de la venta
         ventaTableBody.forEach(row => {
-            console.log("Fila procesada:", row.innerHTML); // ✅ Ver qué hay en la fila
-    
-            const recetaId = row.dataset.recetaId; // Guardar el ID de la receta
+            const recetaId = row.dataset.recetaId; // ID de la receta
             const cantidad = parseInt(row.cells[1].textContent);
             const precio = parseFloat(row.cells[2].textContent.replace("$", ""));
             const subtotal = parseFloat(row.cells[3].textContent.replace("$", ""));
-    
-            console.log(`Procesando detalle - Receta ID: ${recetaId}, Cantidad: ${cantidad}, Precio: ${precio}, Subtotal: ${subtotal}`);
     
             if (!recetaId || isNaN(cantidad) || isNaN(precio)) {
                 console.error("❌ Error en detalle: Falta receta_id, cantidad o precio.");
@@ -264,17 +262,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     
-        console.log("🛠️ Detalles Venta Enviados:", detallesVenta); // ✅ Verificar antes de enviar
-    
-        // Validar que haya datos suficientes para enviar
+        // ✅ Validación: No enviar si faltan datos
         if (!fechaVenta || !medioVenta || totalVenta === 0 || detallesVenta.length === 0) {
             alert("Faltan datos para completar la venta.");
             console.error("❌ Error: Datos de la venta incompletos.");
             return;
         }
     
-        // ✅ 1. Enviar la venta principal y obtener el `venta_id`
         try {
+            // ✅ 1. Enviar la venta principal y obtener el `venta_id`
             const responseVenta = await fetch("http://localhost:5000/api/ventas", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -293,11 +289,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
     
-            const ventaId = resultVenta.venta_id; // ID de la venta recién creada
-    
+            const ventaId = resultVenta.venta_id;
             console.log(`✅ Venta creada con ID: ${ventaId}`);
     
-            // ✅ 2. Enviar los detalles de la venta con `venta_id`
+            // ✅ 2. Enviar los detalles de la venta
             const responseDetalles = await fetch("http://localhost:5000/api/detalle_ventas", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -312,17 +307,70 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
     
-            alert("✅ Venta y detalles registrados con éxito.");
             console.log("✅ Detalles de venta agregados:", resultDetalles);
+    
+            // ✅ 3. Verificar si hay datos de cliente para enviarlos
+            if (nombreCliente || celularCliente) {
+                const clienteResponse = await fetch("http://localhost:5000/api/clientes", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        nombre: nombreCliente || "ANON",  // Si el nombre está vacío, usa "ANON"
+                        celular: celularCliente
+                    })
+                });
+    
+                const resultCliente = await clienteResponse.json();
+    
+                if (!clienteResponse.ok) {
+                    console.error("❌ Error al registrar cliente:", resultCliente);
+                    alert("Error al registrar el cliente.");
+                    return;
+                }
+    
+                const clienteId = resultCliente.cliente_id;
+                console.log(`✅ Cliente registrado con ID: ${clienteId}`);
+    
+                // ✅ 4. Asociar cliente con la venta en `cliente_ventas`
+                const clienteVentaResponse = await fetch("http://localhost:5000/api/cliente_ventas", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ cliente_id: clienteId, venta_id: ventaId })
+                });
+    
+                const resultClienteVenta = await clienteVentaResponse.json();
+    
+                if (!clienteVentaResponse.ok) {
+                    console.error("❌ Error al asociar cliente con venta:", resultClienteVenta);
+                    alert("Error al asociar el cliente con la venta.");
+                    return;
+                }
+    
+                console.log("✅ Cliente asociado a la venta:", resultClienteVenta);
+            } else {
+                console.log("⚠️ No se ingresó cliente, no se registra en clientes ni cliente_ventas.");
+            }
+    
+            alert("✅ Venta, detalles y cliente registrados con éxito.");
+            // ✅ Cerrar el modal después de completar la venta
+            document.getElementById("addVenta").style.display = "none";
+            cargarVentas(hoy, hoy);
     
         } catch (error) {
             console.error("❌ Error en la petición:", error);
         }
     }
-    
+
+    function enviaryactualizar(){
+        enviarVenta();
+        cargarVentas(hoy,hoy);
+    }
     
     // ✅ Asignar evento al botón "Aceptar"
-    document.getElementById("btnAceptarDetalle").addEventListener("click", enviarVenta);
+    document.getElementById("btnAceptarDetalle").addEventListener("click", enviaryactualizar);
+    
+
+    
     
     
 

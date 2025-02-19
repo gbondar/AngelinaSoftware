@@ -570,8 +570,63 @@ def agregar_detalle_ventas():
 
     except sqlite3.Error as e:
         return jsonify({"error": "Error al insertar detalles de venta"}), 500
+    
+# ✅ PUT para actualizar o agregar cliente
+@app.route("/api/clientes", methods=["PUT"])
+def upsert_cliente():
+    data = request.json
+    nombre = data.get("nombre", "").strip()
+    celular = data.get("celular", "").strip()
+
+    if not nombre and not celular:
+        return jsonify({"message": "No se ingresó cliente, no se registrará"}), 200  # No hace nada
+
+    if not nombre:
+        nombre = "ANON"  # Si no hay nombre, lo registramos como ANON
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 🔹 Verificar si el cliente ya existe por número de celular
+    cursor.execute("SELECT id FROM clientes WHERE celular = ?", (celular,))
+    cliente = cursor.fetchone()
+
+    if cliente:
+        cliente_id = cliente["id"]
+    else:
+        # 🔹 Insertar nuevo cliente
+        cursor.execute("INSERT INTO clientes (nombre, celular) VALUES (?, ?)", (nombre, celular))
+        cliente_id = cursor.lastrowid  # Obtener el ID recién generado
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"cliente_id": cliente_id}), 200  # Devuelve el ID del cliente registrado
 
 
+# ✅ PUT para asociar venta con cliente en cliente_ventas
+@app.route("/api/cliente_ventas", methods=["PUT"])
+def asociar_cliente_venta():
+    data = request.json
+    cliente_id = data.get("cliente_id")
+    venta_id = data.get("venta_id")
+
+    if not cliente_id or not venta_id:
+        return jsonify({"error": "Faltan datos para la asociación"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 🔹 Insertar relación en cliente_ventas si no existe
+    cursor.execute(
+        "INSERT OR IGNORE INTO cliente_ventas (cliente_id, venta_id) VALUES (?, ?)",
+        (cliente_id, venta_id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Venta asociada al cliente correctamente"}), 200
 
 
 if __name__ == '__main__':
