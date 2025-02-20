@@ -26,7 +26,9 @@ body {
     color: black;
     padding: 20px;
     margin: 0; /* Asegura que no haya margen extra */
+    overflow:hidden;
 }
+
 
 .main-container {
     display: flex;
@@ -132,10 +134,13 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: auto; /* Habilita el scroll en el modal */
 }
 
 /* Contenido del modal */
 .modal-content {
+    max-height: 90vh; /* Evita que se desborde de la pantalla */
+    overflow-y: auto; /* Scroll vertical cuando es necesario */
     position: relative;
     background-color: #e6d190;
     padding: 20px;
@@ -479,6 +484,8 @@ label[for="recetaSelect"] {
 
 /* Estilo para agrandar el modal */
 .modal-content-wide {
+    max-height: 90vh; /* Aumentamos el espacio disponible */
+    overflow-y: auto; /* Habilita el scroll interno */
     position: relative;
     background-color: #e6d190;
     padding: 20px;

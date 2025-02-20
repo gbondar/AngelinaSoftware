@@ -161,6 +161,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    function actualizarTotalVenta() {
+        let total = 0;
+        document.querySelectorAll("#ventaTableBody .subtotal-cell").forEach(cell => {
+            total += parseFloat(cell.textContent.replace("$", "")) || 0;
+        });
+        document.getElementById("totalVenta").textContent = `$${total.toFixed(2)}`;
+    }
+    
+
 
     // ✅ Función para agregar una venta a la tabla
     function agregarVentaATabla() {
@@ -198,6 +207,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Limpiar los campos después de agregar
         limpiarCamposVenta();
+
+         // ✅ Actualizar el total después de agregar la fila
+        actualizarTotalVenta();
     }
 
         
