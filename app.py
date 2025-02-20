@@ -129,7 +129,7 @@ def get_receta_insumos(receta_id):
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT i.nombre AS insumo, ri.cantidad, i.unidad_medida
+            SELECT i.id AS insumo_id, i.nombre AS insumo, ri.cantidad, i.unidad_medida
             FROM receta_insumos ri
             JOIN insumos i ON ri.insumo_id = i.id
             WHERE ri.receta_id = ?
@@ -627,6 +627,42 @@ def asociar_cliente_venta():
     conn.close()
 
     return jsonify({"message": "Venta asociada al cliente correctamente"}), 200
+
+@app.route('/api/insumos/update_bulk', methods=['PUT'])
+def actualizar_insumos():
+    data = request.json  # Recibe una lista de objetos {insumo_id, cantidad}
+    
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "Datos inválidos para actualizar insumos"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+    
+    try:
+        cursor = conn.cursor()
+
+        for item in data:
+            # Validar que los datos sean correctos
+            if 'insumo_id' not in item or 'cantidad' not in item:
+                print("❌ Error: Falta 'insumo_id' o 'cantidad' en:", item)
+                return jsonify({"error": "Faltan datos en la actualización de insumos"}), 400
+
+            # Actualizar el stock del insumo
+            cursor.execute("""
+                UPDATE insumos
+                SET cantidad = cantidad - ?
+                WHERE id = ?
+            """, (item['cantidad'], item['insumo_id']))
+
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "✅ Insumos actualizados correctamente"}), 200
+
+    except sqlite3.Error as e:
+        print("❌ Error al actualizar insumos:", e)
+        return jsonify({"error": "Error al actualizar insumos"}), 500
+
 
 
 if __name__ == '__main__':

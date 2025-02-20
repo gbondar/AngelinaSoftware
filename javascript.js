@@ -252,10 +252,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
         let totalVenta = 0;
         let detallesVenta = [];
+        let insumosAActualizar = [];
     
         // Recorrer la tabla para obtener los detalles de la venta
-        ventaTableBody.forEach(row => {
-            const recetaId = row.dataset.recetaId; // ID de la receta
+        for (const row of ventaTableBody) {
+            const recetaId = row.dataset.recetaId; 
             const cantidad = parseInt(row.cells[1].textContent);
             const precio = parseFloat(row.cells[2].textContent.replace("$", ""));
             const subtotal = parseFloat(row.cells[3].textContent.replace("$", ""));
@@ -272,9 +273,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 unidades: cantidad,
                 precio_venta: precio
             });
-        });
     
-        // ✅ Validación: No enviar si faltan datos
+            // 🔹 Obtener insumos usados en esta receta
+            const responseRecetaInsumos = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`);
+            const recetaInsumos = await responseRecetaInsumos.json();
+            console.log(`📩 Insumos para receta ID ${recetaId}:`, recetaInsumos);
+
+    
+            if (!responseRecetaInsumos.ok) {
+                console.error("❌ Error al obtener insumos de la receta:", recetaInsumos);
+                alert("Error al obtener insumos de la receta.");
+                return;
+            }
+    
+            // 🔹 Calcular cuántos insumos se deben descontar
+            recetaInsumos.forEach(insumo => {
+                insumosAActualizar.push({
+                    insumo_id: insumo.insumo_id,
+                    cantidad: insumo.cantidad * cantidad  // Se multiplica por la cantidad vendida
+                });
+            });
+        }
+    
         if (!fechaVenta || !medioVenta || totalVenta === 0 || detallesVenta.length === 0) {
             alert("Faltan datos para completar la venta.");
             console.error("❌ Error: Datos de la venta incompletos.");
@@ -282,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     
         try {
-            // ✅ 1. Enviar la venta principal y obtener el `venta_id`
+            // ✅ 1. Enviar la venta y obtener `venta_id`
             const responseVenta = await fetch("http://localhost:5000/api/ventas", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -321,13 +341,32 @@ document.addEventListener("DOMContentLoaded", () => {
     
             console.log("✅ Detalles de venta agregados:", resultDetalles);
     
-            // ✅ 3. Verificar si hay datos de cliente para enviarlos
+            // ✅ 3. Actualizar los insumos
+            if (insumosAActualizar.length > 0) {
+                const responseInsumos = await fetch("http://localhost:5000/api/insumos/update_bulk", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(insumosAActualizar)
+                });
+    
+                const resultInsumos = await responseInsumos.json();
+    
+                if (!responseInsumos.ok) {
+                    console.error("❌ Error al actualizar insumos:", resultInsumos);
+                    alert("Error al actualizar los insumos.");
+                    return;
+                }
+    
+                console.log("✅ Insumos actualizados correctamente.");
+            }
+    
+            // ✅ 4. Registrar cliente si corresponde
             if (nombreCliente || celularCliente) {
                 const clienteResponse = await fetch("http://localhost:5000/api/clientes", {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        nombre: nombreCliente || "ANON",  // Si el nombre está vacío, usa "ANON"
+                        nombre: nombreCliente || "ANON",
                         celular: celularCliente
                     })
                 });
@@ -343,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const clienteId = resultCliente.cliente_id;
                 console.log(`✅ Cliente registrado con ID: ${clienteId}`);
     
-                // ✅ 4. Asociar cliente con la venta en `cliente_ventas`
+                // ✅ 5. Asociar cliente con la venta
                 const clienteVentaResponse = await fetch("http://localhost:5000/api/cliente_ventas", {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -358,13 +397,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
     
-                console.log("✅ Cliente asociado a la venta:", resultClienteVenta);
-            } else {
-                console.log("⚠️ No se ingresó cliente, no se registra en clientes ni cliente_ventas.");
+                console.log("✅ Cliente asociado a la venta.");
             }
     
-            alert("✅ Venta, detalles y cliente registrados con éxito.");
-            // ✅ Cerrar el modal después de completar la venta
+            alert("✅ Venta, detalles, cliente e insumos actualizados correctamente.");
             document.getElementById("addVenta").style.display = "none";
             cargarVentas(hoy, hoy);
     
@@ -372,6 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("❌ Error en la petición:", error);
         }
     }
+    
 
     function enviaryactualizar(){
         enviarVenta();
