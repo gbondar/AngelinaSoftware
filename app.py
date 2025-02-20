@@ -459,7 +459,7 @@ def get_ventas():
             JOIN detalle_ventas dv ON v.id = dv.venta_id
             WHERE datetime(v.fecha_venta) BETWEEN datetime(?) AND datetime(?)
             GROUP BY v.id
-            ORDER BY v.fecha_venta DESC
+            ORDER BY v.fecha_venta ASC
         """, (desde, hasta))
 
         ventas = cursor.fetchall()

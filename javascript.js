@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ Abrir el modal de ventas
     btnCaja.addEventListener("click", () => {
+        fechaDesde.value = hoy; // Establece la fecha actual en "Desde"
+        fechaHasta.value = hoy; // Establece la fecha actual en "Hasta"
         modalVentas.style.display = "flex";
         cargarVentas(hoy, hoy); // Cargar ventas del día actual
     });
@@ -54,6 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
     btnFiltrarVentas.addEventListener("click", () => {
         const desde = fechaDesde.value;
         const hasta = fechaHasta.value;
+        if (new Date(hasta) < new Date(desde)) {
+            alert("⚠️ La fecha 'Hasta' no puede ser anterior a la fecha 'Desde'.");
+            return; // Detiene la ejecución si hay un error
+        }
         cargarVentas(desde, hasta);
     });
 
@@ -220,6 +226,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("recetaVenta").value = "";
         document.getElementById("cantidadVenta").value = "";
         document.getElementById("precioVenta").value = "";
+        document.getElementById("totalVenta").textContent = "$0";
+
     }
 
     // ✅ Función que limpia el modal antes de abrirlo
@@ -230,9 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("medioVenta").value = ""; // Resetea el select
         document.getElementById("nombreCliente").value = "";
         document.getElementById("celularCliente").value = "";
+        
+       
 
         // ✅ Limpiar la tabla de ventas anteriores
         document.getElementById("ventaTableBody").innerHTML = "";
+        document.getElementById("totalVenta").textContent = "$0";
 
         // ✅ Cargar la fecha actual con hora, minutos y segundos
         const now = new Date();
@@ -624,7 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
             row.innerHTML = `
                 <td>${insumo.nombre}</td>
-                <td>${insumo.cantidad}</td>
+                <td>${insumo.cantidad.toFixed(1)}</td>
                 <td>${insumo.unidad_medida}</td>
                 <td>$${insumo.precio_unitario}</td>
             `;
@@ -754,7 +765,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.forEach(insumo => {
                     const option = document.createElement("option");
                     option.value = insumo.nombre;
-                    option.textContent = insumo.nombre;
+                    option.textContent = `${insumo.nombre} (${insumo.unidad_medida})`; // Agrega la unidad de medida
                     select.appendChild(option);
                 });
     
@@ -1818,6 +1829,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeaddVenta() {
         document.getElementById("addVenta").style.display = "none";
+        // ✅ Reiniciar la tabla y el total de la venta
+        document.getElementById("ventaTableBody").innerHTML = "";
+        document.getElementById("totalVenta").textContent = "$0";
     }
     document.getElementById('closeaddVenta').addEventListener('click',closeaddVenta);
     
