@@ -662,6 +662,32 @@ def actualizar_insumos():
     except sqlite3.Error as e:
         print("❌ Error al actualizar insumos:", e)
         return jsonify({"error": "Error al actualizar insumos"}), 500
+    
+# ✅ DELETE para eliminar una venta y sus detalles
+@app.route("/api/ventas/<int:venta_id>", methods=["DELETE"])
+def eliminar_venta(venta_id):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        # 1️⃣ Eliminar detalles de la venta
+        cursor.execute("DELETE FROM detalle_ventas WHERE venta_id = ?", (venta_id,))
+
+        # 2️⃣ Eliminar la venta principal
+        cursor.execute("DELETE FROM ventas WHERE id = ?", (venta_id,))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": f"Venta {venta_id} eliminada correctamente"}), 200
+
+    except sqlite3.Error as e:
+        print("❌ Error al eliminar la venta:", e)
+        return jsonify({"error": "Error al eliminar la venta"}), 500
+
 
 
 

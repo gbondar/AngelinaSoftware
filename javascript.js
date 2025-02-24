@@ -105,6 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             ventas.forEach(venta => {
                 const row = document.createElement("tr");
+                row.setAttribute("data-venta-id", venta.venta_id); // ✅ Guarda el ID de la venta en la fila
+
     
                 // ✅ Validar y formatear la fecha
                 let fechaFormateada = "Fecha inválida";
@@ -483,6 +485,42 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btnCancelarEliminarVenta").addEventListener("click", () => {
         document.getElementById("confirmarEliminarVentaModal").style.display = "none";
     });
+
+        // ✅ Evento para confirmar la eliminación de una venta
+    //Funcion de eliminar venta
+    document.getElementById("btnConfirmarEliminarVenta").addEventListener("click", async () => {
+        const selectedRow = document.querySelector("#ventasTableBody .selected");
+
+        if (!selectedRow) {
+            alert("⚠️ No hay ninguna venta seleccionada.");
+            return;
+        }
+
+        const ventaId = selectedRow.getAttribute("data-venta-id"); // Obtener el ID de la venta
+        
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/ventas/${ventaId}`, {
+                method: "DELETE",
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                alert(`❌ Error al eliminar la venta: ${result.error}`);
+                return;
+            }
+
+            alert(`✅ Venta eliminada correctamente.`);
+            document.getElementById("confirmarEliminarVentaModal").style.display = "none";
+
+            // Recargar la lista de ventas después de eliminar
+            cargarVentas(hoy, hoy);
+        } catch (error) {
+            console.error("❌ Error en la eliminación:", error);
+        }
+    });
+
 
     
 
