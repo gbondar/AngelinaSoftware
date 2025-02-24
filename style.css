@@ -594,22 +594,54 @@ label[for="recetaSelect"] {
     .modal-content {
         width: 60%;
     }
-    .button {
-        width: 150px; /* Reduce el ancho */
-        font-size: 12px; /* Ajusta el tamaño del texto */
-        height: 50px; /* Ajusta la altura */
-    }
     
     .buttons-container {
         gap: 8px; /* Reduce el espacio entre los botones */
     }
 
-    .main-button {
-        width: 250px; /* Ajusta el tamaño en pantallas pequeñas */
-        height: 400px;
+    .main-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+        grid-gap: 10px; /* Reducimos el espacio entre botones */
+        justify-content: center; /* Centrar horizontalmente */
+        align-items: center;
+        align-content: center; /* Mantiene el conjunto alineado verticalmente */
+        width: 100%; /* Asegurar que ocupa todo el ancho */
+        max-width: 400px; /* Para centrar bien */
+        margin: 0 auto; /* Centra en la pantalla */
+        padding-top: 100px; /* Espacio para no tapar el header */
+        height: calc(100vh - 120px); /* Ajuste dinámico según la pantalla */
     }
 
+    /* Ajustar el tamaño de los botones */
+    .main-button {
+        width: 180px; /* Tamaño proporcional */
+        height: 280px;
+        background-size: contain;
+    }
+
+    /* Ajustar el texto dentro del botón */
     .main-button span {
-        font-size: 20px; /* Reduce el tamaño del texto en pantallas pequeñas */
+        font-size: 22px;
+        position: relative;
+        padding-top: 5px;
     }
 }
+    
+@media (max-width: 516px) {
+    /* Ajustar botones de los modales */
+    .modal-buttons {
+        display: flex;
+        flex-wrap: nowrap; /* Mantiene los botones en línea */
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    .modal-buttons button {
+        flex: 1; /* Distribuye el espacio de manera uniforme */
+        font-size: 14px; /* Reduce un poco el tamaño */
+        padding: 8px 10px; /* Se ajusta sin perder usabilidad */
+        min-width: auto; /* Evita que se desborden */
+    }
+}
+
