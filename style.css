@@ -115,9 +115,12 @@ button {
     border-radius: 5px;
     transition: background-color 0.3s;
     font-family: 'Roboto', sans-serif !important;
+    border: 2px solid #e6d190;
 }
 
 button:hover {
+    transform: scale(1.05);
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
     background-color: #341d4f;
 }
 
@@ -548,6 +551,42 @@ label[for="recetaSelect"] {
     font-weight: bold;
 }
 
+/* Contenedor para el botón "Agregar" */
+.add-button-container {
+    display: flex;
+    justify-content: center; /* Centra el botón */
+    margin-bottom: 10px; /* Espacio con los botones de abajo */
+}
+
+/* Estilos para el botón "Agregar" */
+.add-circle-btn {
+    width: 50px;
+    height: 50px;
+    background-color: #5A3B81; /* Violeta */
+    color: white;
+    border: 2px solid #e6d190; /* Borde plateado */
+    border-radius: 50%; /* Lo hace circular */
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto hover profesional */
+.add-circle-btn:hover {
+    background-color: #7D58B3; /* Un violeta más claro */
+    transform: scale(1.1);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Efecto al hacer clic */
+.add-circle-btn:active {
+    transform: scale(0.95);
+}
 
 
 /* Responsive para pantallas menores a 820px */

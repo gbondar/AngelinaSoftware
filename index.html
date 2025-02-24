@@ -64,7 +64,14 @@
                     <input type="text" id="nombreNuevo">
                     
                     <label for="unidadNuevo">Unidad de Medida:</label>
-                    <input type="text" id="unidadNuevo">
+                    <select id="unidadNuevo" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="Kg">Kg</option>
+                        <option value="Gr">Gr</option>
+                        <option value="Lt">Lt</option>
+                        <option value="Ml">Ml</option>
+                        <option value="Unidades">Unidades</option>
+                    </select> 
                 </div>
             
                 <label for="cantidad">Cantidad:</label>
@@ -217,10 +224,14 @@
                 <!-- Aquí se agregarán dinámicamente los inputs -->
             </div>
 
+             <!-- Botón Agregar en su propia línea -->
+            <div class="add-button-container">
+                <button type="button" id="btnAgregarNuevoInsumo" class="add-circle-btn">+</button>
+            </div>
+
 
 
             <div class="modal-buttons">
-                <button type="button" id="btnAgregarNuevoInsumo">Agregar</button>
                 <button type="button" id="btnAceptarModifInsumo">Guardar</button>
                 <button type="button" id='btnCancelarModifInsumo'">Cancelar</button>
             </div>
