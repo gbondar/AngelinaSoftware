@@ -30,9 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const ventaTableBody = document.getElementById("ventaTableBody");
     btnAgregarDetalle.addEventListener("click", agregarVentaATabla);
     const fechaVenta = document.getElementById('fechaVenta');
+    const confirmarEliminarVentaModal = document.getElementById("confirmarEliminarVentaModal");
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
+    confirmarEliminarVentaModal.style.display = "none";
 
     // ✅ Establecer fechas por defecto al día actual
     const hoy = new Date().toISOString().split("T")[0];
@@ -449,9 +451,39 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Asignar evento al botón "Aceptar"
     document.getElementById("btnAceptarDetalle").addEventListener("click", enviaryactualizar);
     
+    // ✅ Función para abrir el modal de confirmación de eliminación
+    function abrirModalEliminarVenta() {
+        const selectedRow = document.querySelector("#ventasTableBody .selected");
 
-    
-    
+        if (!selectedRow) {
+            alert("⚠️ Debes seleccionar una venta para eliminar.");
+            return;
+        }
+
+        // Obtener datos de la venta seleccionada
+        const fechaVenta = selectedRow.cells[0].textContent; // La fecha está en la primera celda
+        const totalVenta = selectedRow.cells[2].textContent; // El total está en la tercera celda
+
+        // Configurar el mensaje dentro del modal
+        document.getElementById("mensajeEliminarVenta").textContent = `¿Desea eliminar la venta de ${fechaVenta} - Total ${totalVenta}?`;
+
+        // Mostrar el modal
+        document.getElementById("confirmarEliminarVentaModal").style.display = "flex";
+    }
+
+    // ✅ Evento para abrir el modal de confirmación al hacer clic en "Eliminar Venta"
+    document.getElementById("btnEliminarVenta").addEventListener("click", abrirModalEliminarVenta);
+
+        // ✅ Evento para cerrar el modal al hacer clic en la X
+    document.getElementById("closeEliminarVenta").addEventListener("click", () => {
+        document.getElementById("confirmarEliminarVentaModal").style.display = "none";
+    });
+
+    // ✅ Evento para cerrar el modal al hacer clic en "Cancelar"
+    document.getElementById("btnCancelarEliminarVenta").addEventListener("click", () => {
+        document.getElementById("confirmarEliminarVentaModal").style.display = "none";
+    });
+
     
 
     //FIN MODULO VENTAS
