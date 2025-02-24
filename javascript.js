@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ✅ Función para agregar una venta a la tabla
-    function agregarVentaATabla() {
+    async function agregarVentaATabla() {
         // Obtener valores de los inputs
         const selectReceta = document.getElementById("recetaVenta");
         const recetaId = selectReceta.value;
@@ -193,33 +193,53 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Calcular subtotal
-        const subtotal = cantidad * precio;
+        try {
+            // 🔹 Verificar si la receta tiene insumos en receta_insumos
+            const response = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`);
+            const insumos = await response.json();
 
-        // Crear una nueva fila para la tabla
-        const row = document.createElement("tr");
-        row.setAttribute("data-receta-id", recetaId); // ✅ Almacenar el ID de la receta
-        row.innerHTML = `
-            <td>${recetaNombres}</td>
-            <td>${cantidad}</td>
-            <td>$${precio.toFixed(2)}</td>
-            <td class="subtotal-cell">
-                $${subtotal.toFixed(2)}
-            </td>
-        `;
+            if (!response.ok) {
+                throw new Error("Error al obtener insumos de la receta.");
+            }
 
-        // Agregar fila a la tabla
-        ventaTableBody.appendChild(row);
+            if (insumos.length === 0) {
+                alert("⚠️ La receta seleccionada no tiene insumos cargados. Proceda primero a cargarlos desde el boton '+' en la pestaña principal.");
+                return; // Detener la función si no hay insumos
+            }
 
-        // Limpiar los campos después de agregar
-        limpiarCamposVenta();
+            // Calcular subtotal
+            const subtotal = cantidad * precio;
 
-         // ✅ Actualizar el total después de agregar la fila
-        actualizarTotalVenta();
+            // Crear una nueva fila para la tabla
+            const row = document.createElement("tr");
+            row.setAttribute("data-receta-id", recetaId); // ✅ Almacenar el ID de la receta
+            row.innerHTML = `
+                <td>${recetaNombres}</td>
+                <td>${cantidad}</td>
+                <td>$${precio.toFixed(2)}</td>
+                <td class="subtotal-cell">
+                    $${subtotal.toFixed(2)}
+                </td>
+            `;
+
+            // Agregar fila a la tabla
+            ventaTableBody.appendChild(row);
+
+            // Limpiar los campos después de agregar
+            limpiarCamposVenta();
+
+            // ✅ Actualizar el total después de agregar la fila
+            actualizarTotalVenta();
+
+        } catch (error) {
+            console.error("❌ Error verificando insumos de la receta:", error);
+            alert("Hubo un error al verificar los insumos de la receta.");
+        }
     }
 
+
+            
         
-    
     
     // Función para limpiar los inputs después de agregar una venta
     function limpiarCamposVenta() {
