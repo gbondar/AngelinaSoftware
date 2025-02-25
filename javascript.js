@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnAgregarDetalle.addEventListener("click", agregarVentaATabla);
     const fechaVenta = document.getElementById('fechaVenta');
     const confirmarEliminarVentaModal = document.getElementById("confirmarEliminarVentaModal");
+    const modalReportes = document.getElementById("modalReportes");
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
@@ -520,11 +521,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("❌ Error en la eliminación:", error);
         }
     });
-
-
-    
-
     //FIN MODULO VENTAS
+
     
 
     // Asegurar que los modales inicien cerrados
@@ -532,6 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
     addModal.style.display = "none";
     modifModal.style.display = "none";
     elimModal.style.display = "none";
+    modalReportes.style.display="none";
 
    
     modalRecetas.style.display = "none";
@@ -655,6 +654,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeVerVenta() {
         document.getElementById('verVenta').style.display = "none";
     }
+
+   
 
     
 
@@ -1902,6 +1903,17 @@ document.addEventListener("DOMContentLoaded", () => {
     //click cancelar eliminar receta
     document.getElementById("btnEliCancelReceta").addEventListener("click", closeElimModalRecetas);
 
+    function openReportes(){
+        document.getElementById('modalReportes').style.display = "flex";
+    }
+
+    function closeReportes(){
+        document.getElementById('modalReportes').style.display = "none";
+    }
+
+    //click abrir reportes
+    document.getElementById("btnReportes").addEventListener("click", openReportes)
+
 
     // Agregar eventos a las cruces de los modales
     document.getElementById("closeModal").addEventListener("click", closeModal);
@@ -1916,6 +1928,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("closeElimModalRecetas").addEventListener("click", closeElimModalRecetas);
     document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
     document.getElementById('closeVerVenta').addEventListener('click',closeVerVenta);
+    document.getElementById('closeModalReportes').addEventListener('click',closeReportes);
 
     function closeaddVenta() {
         document.getElementById("addVenta").style.display = "none";
