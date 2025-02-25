@@ -7,6 +7,10 @@ import openpyxl
 from openpyxl.styles import Font
 from flask import send_file
 from flask_cors import CORS
+from openpyxl.styles import Font, Alignment, NamedStyle
+from openpyxl.utils import get_column_letter
+from openpyxl.chart import PieChart, Reference
+
 
 app = Flask(__name__)
 CORS(app)
@@ -714,22 +718,31 @@ def generar_reporte_ventas():
 
         # 🔹 Crear archivo Excel
         wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Reporte Ventas"
 
-        # 🔹 Escribir encabezados
-        headers = ["Venta", "Fecha", "ID", "Unidades", "Costo Total Insumos",
-                   "Valor Venta", "Medio de Venta", "Comisiones Venta",
+        # ======== 📌 HOJA 1: DETALLE VENTAS ===========
+        ws = wb.active
+        ws.title = "Detalle Ventas"
+
+        # 🔹 Escribir encabezados con filtro
+        headers = ["Venta", "Fecha", "ID", "Unidades", "Medio de Venta", 
+                   "Costo Total Insumos", "Valor Venta", "Comisiones Venta",
                    "Ganancia Bruta", "Rentabilidad Bruta"]
         ws.append(headers)
 
-        # Aplicar formato de encabezado (negrita)
-        for cell in ws[1]:
+        # Aplicar formato de encabezado (negrita y alineación centrada)
+        for cell in ws[1]:  
             cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal="center")
 
         # 🔹 Llenar datos
+        medio_venta_count = {}  # Para la hoja de gráfico
+
         for row in detalles:
             venta_id, fecha_venta, receta_nombre, unidades, precio_venta, medio_venta = row
+
+            # Convertir fecha al formato DD-MM-AAAA
+            fecha_venta = fecha_venta.split("T")[0]  # Elimina la hora
+            fecha_venta = "-".join(reversed(fecha_venta.split("-")))  # Convierte a DD-MM-YYYY
 
             # Obtener costos de insumos para esta receta
             cursor.execute("""
@@ -747,17 +760,86 @@ def generar_reporte_ventas():
             ganancia_bruta = (precio_venta - costo_total_insumos) - (precio_venta * comision_venta)
             rentabilidad_bruta = (ganancia_bruta / costo_total_insumos) if costo_total_insumos > 0 else 0
 
+            # Contar medios de venta para el gráfico
+            if medio_venta in medio_venta_count:
+                medio_venta_count[medio_venta] += unidades
+            else:
+                medio_venta_count[medio_venta] = unidades
+
             # Añadir cada unidad como fila separada
             for _ in range(unidades):
-                ws.append([
-                    receta_nombre, fecha_venta, venta_id, 1,  # Siempre 1 unidad por fila
-                    round(costo_total_insumos, 2), round(precio_venta, 2), medio_venta,
+                row_data = [
+                    receta_nombre, fecha_venta, venta_id, 1, medio_venta,
+                    round(costo_total_insumos, 2), round(precio_venta, 2),
                     round(comision_venta * precio_venta, 2), round(ganancia_bruta, 2),
-                    round(rentabilidad_bruta, 2)
-                ])
+                    rentabilidad_bruta
+                ]
+                ws.append(row_data)
 
-        # 🔹 Guardar el archivo Excel
-        file_path = "reporte_ventas.xlsx"
+        # 🔹 Aplicar formato de porcentaje a la columna "Rentabilidad Bruta"
+        for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=10, max_col=10):
+            for cell in row:
+                cell.number_format = "0.00%"
+        
+        # 🔹 Ajustar tamaño de columnas automáticamente
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)  # Obtener letra de columna
+            for cell in col:
+                try:
+                    max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+        # 🔹 Agregar Filtro Manual en la Tabla
+        ws.auto_filter.ref = f"A1:J{ws.max_row}"
+
+        # ======== 📌 TOTALIZADORES ===========
+        last_row = ws.max_row + 1  # Fila donde irá el total
+
+        ws.append(["", "", "", "", "TOTAL:", 
+                   f"=SUBTOTAL(9,F2:F{last_row-1})", f"=SUBTOTAL(9,G2:G{last_row-1})", 
+                   f"=SUBTOTAL(9,H2:H{last_row-1})", f"=SUBTOTAL(9,I2:I{last_row-1})", 
+                   f"=I{last_row}/F{last_row}"])
+
+        # Aplicar negrita y tamaño mayor en la fila total
+        for cell in ws[last_row]:
+            cell.font = Font(bold=True, size=12)
+
+        # Aplicar formato de porcentaje a la celda de total "Rentabilidad Bruta"
+        ws[f"J{last_row}"].number_format = "0.00%"
+
+        # ======== 📌 HOJA 2: MEDIO DE VENTA ===========
+        ws_chart = wb.create_sheet(title="Medio de Venta")
+
+        ws_chart.append(["Medio de Venta", "Cantidad de Ventas"])
+        for medio, count in medio_venta_count.items():
+            ws_chart.append([medio, count])
+
+        # 🔹 Crear gráfico de torta más grande y con mejoras visuales
+        pie = PieChart()
+        labels = Reference(ws_chart, min_col=1, min_row=2, max_row=len(medio_venta_count) + 1)
+        data = Reference(ws_chart, min_col=2, min_row=1, max_row=len(medio_venta_count) + 1)
+        pie.add_data(data, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = "Distribución de Medios de Venta"
+        pie.width = 18  # Más ancho
+        pie.height = 12  # Más alto
+
+        # Agregar etiquetas solo con porcentaje
+        from openpyxl.chart.label import DataLabelList
+        pie.dataLabels = DataLabelList()
+        pie.dataLabels.showPercent = True
+        pie.dataLabels.showLeaderLines = False
+
+        # Mover la leyenda a la derecha con más separación
+        pie.legend.position = "r"  # "r" significa derecha
+
+        ws_chart.add_chart(pie, "D6")  # Ubicación del gráfico en la hoja
+
+        # 🔹 Guardar el archivo Excel con nombre correcto
+        file_path = "reporte_ventas_2.xlsx"
         wb.save(file_path)
 
         conn.close()
@@ -767,9 +849,7 @@ def generar_reporte_ventas():
     except sqlite3.Error as e:
         print("❌ Error al generar el reporte:", e)
         return jsonify({"error": "Error al generar el reporte"}), 500
-
-
-
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
