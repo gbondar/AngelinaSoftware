@@ -436,9 +436,37 @@
         </div>
     </div>
 
+     <!-- Filtros de reporte cliente -->
+    <div id="modalClientes" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalCliente">&times;</span>
+            <h2>Filtro Fecha</h2>
+            <div class="filtro-fechas-cliente">
+                <label for="fechaDesdeCliente">Desde:</label>
+                <input type="date" id="fechaDesdeCliente">
+                <label for="fechaHastaCliente">Hasta:</label>
+                <input type="date" id="fechaHastaCliente">
+                <button id="btnConfirmarCliente">Aceptar</button>
+                <button id="btnCancelarCliente">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
-
-
+     <!-- Filtros de reporte Pedidos -->
+     <div id="modalPedidos" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalPedidos">&times;</span>
+            <h2>Filtro Fecha</h2>
+            <div class="filtro-fechas-pedidos">
+                <label for="fechaDesdePedidos">Desde:</label>
+                <input type="date" id="fechaDesdePedidos">
+                <label for="fechaHastaPedidos">Hasta:</label>
+                <input type="date" id="fechaHastaPedidos">
+                <button id="btnConfirmarPedidos">Aceptar</button>
+                <button id="btnCancelarPedidos">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="javascript.js"></script>
 

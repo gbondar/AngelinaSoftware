@@ -32,10 +32,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const fechaVenta = document.getElementById('fechaVenta');
     const confirmarEliminarVentaModal = document.getElementById("confirmarEliminarVentaModal");
     const modalReportes = document.getElementById("modalReportes");
+    const modalClientes = document.getElementById('modalClientes');
+    const modalPedidos = document.getElementById("modalPedidos");
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
     confirmarEliminarVentaModal.style.display = "none";
+    
 
     // ✅ Establecer fechas por defecto al día actual
     const hoy = new Date().toISOString().split("T")[0];
@@ -525,6 +528,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //MODULO REPORTES
 
+    
+
+
     async function descargarReporte(apiUrl, nombreArchivo) {
         try {
             const response = await fetch(apiUrl);
@@ -558,6 +564,8 @@ document.addEventListener("DOMContentLoaded", () => {
     modifModal.style.display = "none";
     elimModal.style.display = "none";
     modalReportes.style.display="none";
+    modalClientes.style.display = "none";
+    modalPedidos.style.display = "none";
 
    
     modalRecetas.style.display = "none";
@@ -1956,8 +1964,45 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('modalReportes').style.display = "none";
     }
 
+
     //click abrir reportes
     document.getElementById("btnReportes").addEventListener("click", openReportes)
+
+
+    function openClientes(){
+        document.getElementById('modalClientes').style.display = "flex";
+    }
+
+    function closeClientes(){
+        document.getElementById('modalClientes').style.display = "none";
+    }
+
+    //click abrir reporte clientes fecha
+    document.getElementById("btnReporteClient").addEventListener("click", openClientes)
+
+    //click cerrar reporte clientes fecha
+    document.getElementById("btnCancelarCliente").addEventListener("click", closeClientes)
+
+
+    //Open y cierre pedidos
+
+    function openPedidos(){
+        document.getElementById('modalPedidos').style.display = "flex";
+    }
+
+    function closePedidos(){
+        document.getElementById('modalPedidos').style.display = "none";
+    }
+
+    //click abrir reporte Pedidos fecha
+    document.getElementById("btnReporteTend").addEventListener("click", openPedidos)
+
+    //click cerrar reporte Pedidos fecha
+    document.getElementById("btnCancelarPedidos").addEventListener("click", closePedidos)
+
+    
+
+
 
 
     // Agregar eventos a las cruces de los modales
@@ -1974,6 +2019,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('closeInsuRecet').addEventListener('click',closeModifInsumosRecetaModal);
     document.getElementById('closeVerVenta').addEventListener('click',closeVerVenta);
     document.getElementById('closeModalReportes').addEventListener('click',closeReportes);
+    document.getElementById('closeModalCliente').addEventListener('click',closeClientes);
+    document.getElementById('closeModalPedidos').addEventListener('click',closePedidos);
+
+
 
     function closeaddVenta() {
         document.getElementById("addVenta").style.display = "none";
