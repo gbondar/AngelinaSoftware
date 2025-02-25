@@ -1,6 +1,11 @@
 from flask import Flask, request, jsonify
 import sqlite3
 import datetime
+import pandas as pd
+import os
+import openpyxl
+from openpyxl.styles import Font
+from flask import send_file
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -687,6 +692,81 @@ def eliminar_venta(venta_id):
     except sqlite3.Error as e:
         print("❌ Error al eliminar la venta:", e)
         return jsonify({"error": "Error al eliminar la venta"}), 500
+    
+@app.route('/api/reporte_ventas', methods=['GET'])
+def generar_reporte_ventas():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # 🔹 Obtener detalles de ventas con nombres de recetas
+        cursor.execute("""
+            SELECT dv.venta_id, v.fecha_venta, r.nombre AS receta_nombre, 
+                   dv.unidades, dv.precio_venta, v.medio_venta
+            FROM detalle_ventas dv
+            JOIN recetas r ON dv.receta_id = r.id
+            JOIN ventas v ON dv.venta_id = v.id
+        """)
+        detalles = cursor.fetchall()
+
+        if not detalles:
+            return jsonify({"error": "No hay datos disponibles"}), 404
+
+        # 🔹 Crear archivo Excel
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Reporte Ventas"
+
+        # 🔹 Escribir encabezados
+        headers = ["Venta", "Fecha", "ID", "Unidades", "Costo Total Insumos",
+                   "Valor Venta", "Medio de Venta", "Comisiones Venta",
+                   "Ganancia Bruta", "Rentabilidad Bruta"]
+        ws.append(headers)
+
+        # Aplicar formato de encabezado (negrita)
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        # 🔹 Llenar datos
+        for row in detalles:
+            venta_id, fecha_venta, receta_nombre, unidades, precio_venta, medio_venta = row
+
+            # Obtener costos de insumos para esta receta
+            cursor.execute("""
+                SELECT ri.insumo_id, ri.cantidad, i.precio_unitario
+                FROM receta_insumos ri
+                JOIN insumos i ON ri.insumo_id = i.id
+                WHERE ri.receta_id = (SELECT id FROM recetas WHERE nombre = ?)
+            """, (receta_nombre,))
+            insumos = cursor.fetchall()
+
+            costo_total_insumos = sum(insumo[1] * insumo[2] for insumo in insumos)
+
+            # Calcular comisión de venta
+            comision_venta = 0.255 if medio_venta.lower() == "pedidosya" else 0
+            ganancia_bruta = (precio_venta - costo_total_insumos) - (precio_venta * comision_venta)
+            rentabilidad_bruta = (ganancia_bruta / costo_total_insumos) if costo_total_insumos > 0 else 0
+
+            # Añadir cada unidad como fila separada
+            for _ in range(unidades):
+                ws.append([
+                    receta_nombre, fecha_venta, venta_id, 1,  # Siempre 1 unidad por fila
+                    round(costo_total_insumos, 2), round(precio_venta, 2), medio_venta,
+                    round(comision_venta * precio_venta, 2), round(ganancia_bruta, 2),
+                    round(rentabilidad_bruta, 2)
+                ])
+
+        # 🔹 Guardar el archivo Excel
+        file_path = "reporte_ventas.xlsx"
+        wb.save(file_path)
+
+        conn.close()
+
+        return send_file(file_path, as_attachment=True)
+
+    except sqlite3.Error as e:
+        print("❌ Error al generar el reporte:", e)
+        return jsonify({"error": "Error al generar el reporte"}), 500
 
 
 

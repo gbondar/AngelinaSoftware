@@ -523,7 +523,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     //FIN MODULO VENTAS
 
+    //MODULO REPORTES
+
+    async function descargarReporte(apiUrl, nombreArchivo) {
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Error al generar el reporte");
     
+            // ✅ Descargar el archivo
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+    
+        } catch (error) {
+            console.error("❌ Error al descargar el reporte:", error);
+            alert("Hubo un error al generar el reporte.");
+        }
+    }
+
+    // ✅ Asociar la función al botón
+    document.getElementById("btnReporteCurrent").addEventListener("click", function() {
+        descargarReporte("http://localhost:5000/api/reporte_ventas", "reporte_ventas.xlsx");
+    });
+
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
