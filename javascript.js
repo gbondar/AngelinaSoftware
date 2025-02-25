@@ -867,6 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 select.appendChild(newOption);
     
                 document.getElementById("nuevoInsumoFields").style.display = "none";
+                limpiarVentanaInsumos();
                 document.getElementById("cantidad").value = "";
                 document.getElementById("precio").value = "";
     
@@ -1180,6 +1181,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+    function limpiarVentanaInsumos() {
+        document.getElementById("nombreNuevo").value = "";  // Limpia el campo del nombre
+        document.getElementById("unidadNuevo").value = "";  // Limpia la unidad de medida
+        document.getElementById("cantidad").value = "";     // Limpia la cantidad
+        document.getElementById("precio").value = "";       // Limpia el precio
+    }
+    
     
     //Esto sirve para hacer que lea los insumos ya cargados a insumo-receta. 
     document.getElementById("recetaSelect").addEventListener("change", async function () {
@@ -1737,6 +1746,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Selecciona una receta para modificar.");
             return;
         }
+        
     
         fetch("http://localhost:5000/api/recetas")
             .then(response => response.json())
@@ -1872,10 +1882,18 @@ document.addEventListener("DOMContentLoaded", () => {
     //click a recetas
     document.getElementById("btnRecetas").addEventListener("click", fetchRecetas);
 
-    // Click para abrir el modal de agregar receta
-    document.getElementById("btnAgregarReceta").addEventListener("click", function() {
+    function limpiarVentanaRecetas() {
+        document.getElementById("nombreReceta").value = "";  // Limpia el campo del nombre del producto
+        document.getElementById("precioReceta").value = "";  // Limpia el campo del precio
+    }
+
+    function openAddModalRecetas() {
+        limpiarVentanaRecetas();  // 🔹 Limpia los campos antes de abrir el modal
         document.getElementById("addModalRecetas").style.display = "flex";
-    });
+    }
+
+    // Click para abrir el modal de agregar receta
+    document.getElementById("btnAgregarReceta").addEventListener("click", openAddModalRecetas);
 
      
     //click agregar receta
@@ -1961,15 +1979,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-    
-    
-    //Cierra al tocar afuera de los modals
-    window.onclick = function (event) {
-        if (event.target === modal) {
-            closeModal();
-        } else if (event.target === addModal) {
-            closeAddModal();
-        }
-    };
 });
 
