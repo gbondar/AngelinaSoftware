@@ -257,6 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("cantidadVenta").value = "";
         document.getElementById("precioVenta").value = "";
         document.getElementById("totalVenta").textContent = "$0";
+        // 🔹 Desmarcar radio buttons de precio
+        document.getElementById("tipoPrecio1").checked = false; // Pedidos Ya
+        document.getElementById("tipoPrecio2").checked = false; // Descuento
 
     }
 
@@ -268,6 +271,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("medioVenta").value = ""; // Resetea el select
         document.getElementById("nombreCliente").value = "";
         document.getElementById("celularCliente").value = "";
+        // 🔹 Desmarcar radio buttons de precio
+        document.getElementById("tipoPrecio1").checked = false; // Pedidos Ya
+        document.getElementById("tipoPrecio2").checked = false; // Descuento
         
        
 
@@ -1068,6 +1074,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 option.value = receta.id;
                 option.setAttribute("data-id", receta.id); // Guardar receta-id en un atributo
                 option.textContent =receta.nombre;
+                option.dataset.precioVenta = receta.precio_venta;  // Precio normal (Pedidos Ya)
+                option.dataset.precioVenta2 = receta.precio_venta_2; // Precio con Descuento
                 recetaSelect.appendChild(option);
             });
         } catch (error) {
@@ -1083,39 +1091,58 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch("http://localhost:5000/api/recetas");
             if (!response.ok) throw new Error("Error al obtener recetas");
-
-            
     
             const recetas = await response.json();
             const selectReceta = document.getElementById("recetaVenta");
-
+            const precioVenta = document.getElementById("precioVenta");
+            const tipoPrecioPedidosYa = document.getElementById("tipoPrecio1"); // Pedidos Ya
+            const tipoPrecioDescuento = document.getElementById("tipoPrecio2"); // Descuento
+    
             // ✅ Limpiar opciones previas antes de cargar nuevas recetas
-            selectReceta.innerHTML = '<option value="">Selecciona una opción</option>';
+            selectReceta.innerHTML = '<option value="">Selecciona una receta</option>';
     
             recetas.forEach(receta => {
                 const option = document.createElement("option");
                 option.value = receta.id;
                 option.textContent = receta.nombre;
-                option.dataset.precio = receta.precio_venta; // Guardamos el precio en el atributo dataset
+                option.dataset.precioVenta = receta.precio_venta;  // Precio normal (Pedidos Ya)
+                option.dataset.precioVenta2 = receta.precio_venta_2; // Precio con Descuento
                 selectReceta.appendChild(option);
             });
     
-            // Evento para cambiar el precio cuando se selecciona una receta
-            selectReceta.addEventListener("change", () => {
+            // ✅ Evento para actualizar precio según la opción seleccionada
+            function actualizarPrecio() {
                 const selectedOption = selectReceta.options[selectReceta.selectedIndex];
-                const precioVenta = document.getElementById("precioVenta");
     
-                if (selectedOption.value) {
-                    precioVenta.value = Math.round(selectedOption.dataset.precio);
-                } else {
-                    precioVenta.value = ""; // Si no hay selección, vacía el campo de precio
+                if (!selectedOption.value) {
+                    alert("⚠️ Primero selecciona una receta.");
+                    tipoPrecioPedidosYa.checked = false;
+                    tipoPrecioDescuento.checked = false;
+                    precioVenta.value = "";
+                    return;
                 }
-            });
+    
+                if (tipoPrecioPedidosYa.checked) {
+                    precioVenta.value = selectedOption.dataset.precioVenta;
+                } else if (tipoPrecioDescuento.checked) {
+                    precioVenta.value = selectedOption.dataset.precioVenta2;
+                } else {
+                    precioVenta.value = ""; // Si se deseleccionan ambos, limpiar el precio
+                }
+            }
+    
+            // ✅ Agregar eventos a los radio buttons
+            tipoPrecioPedidosYa.addEventListener("change", actualizarPrecio);
+            tipoPrecioDescuento.addEventListener("change", actualizarPrecio);
     
         } catch (error) {
             console.error("Error cargando recetas:", error);
         }
     }
+    
+    // ✅ Ejecutar la función al cargar la página
+    document.addEventListener("DOMContentLoaded", cargarRecetasyPrecio);
+    
     
 
 
