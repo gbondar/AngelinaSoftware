@@ -599,6 +599,42 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // ✅ Asociar la función al botón
     document.getElementById("btnConfirmarCliente").addEventListener("click", reporteCliente);
+
+
+    async function reportePedidos() {
+        const fechaDesde = document.getElementById("fechaDesdePedidos").value;
+        const fechaHasta = document.getElementById("fechaHastaPedidos").value;
+    
+        if (!fechaDesde || !fechaHasta) {
+            alert("Por favor, selecciona ambas fechas.");
+            return;
+        }
+    
+        const apiUrl = `http://localhost:5000/api/reporte_pedidos?desde=${fechaDesde}&hasta=${fechaHasta}`;
+        const nombreArchivo = `reporte_pedidos_${fechaDesde}_a_${fechaHasta}.xlsx`;
+    
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Error al generar el reporte");
+    
+            // ✅ Descargar el archivo
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("❌ Error al descargar el reporte:", error);
+            alert("Hubo un error al generar el reporte.");
+        }
+    }
+    
+
+    document.getElementById("btnConfirmarPedidos").addEventListener("click", reportePedidos);
+    
     
 
 

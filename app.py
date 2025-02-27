@@ -939,6 +939,91 @@ def generar_reporte_clientes():
     except sqlite3.Error as e:
         print("❌ Error al generar el reporte de clientes:", e)
         return jsonify({"error": "Error al generar el reporte"}), 500
+    
+@app.route('/api/reporte_pedidos', methods=['GET'])
+def generar_reporte_pedidos():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Obtener parámetros de fecha del request
+    fecha_desde = request.args.get('desde')
+    fecha_hasta = request.args.get('hasta')
+
+    if not fecha_desde or not fecha_hasta:
+        return jsonify({"error": "Se requieren ambas fechas para generar el reporte"}), 400
+
+    try:
+        # 🔹 Obtener pedidos agrupados por receta_id dentro del rango de fechas
+        cursor.execute("""
+            SELECT r.nombre AS receta_nombre, 
+                   SUM(dv.unidades) AS total_pedidos, 
+                   SUM(dv.precio_venta * dv.unidades) AS total_ingreso
+            FROM detalle_ventas dv
+            JOIN recetas r ON dv.receta_id = r.id
+            JOIN ventas v ON dv.venta_id = v.id
+            WHERE DATE(v.fecha_venta) BETWEEN DATE(?) AND DATE(?)
+            GROUP BY dv.receta_id
+        """, (fecha_desde, fecha_hasta))
+        
+        pedidos = cursor.fetchall()
+
+        if not pedidos:
+            return jsonify({"error": "No hay datos disponibles en el rango seleccionado"}), 404
+
+        # 🔹 Crear archivo Excel
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Reporte Pedidos"
+
+        # 🔹 Escribir encabezados con formato
+        headers = ["Receta", "Total Pedidos", "Total Ingreso"]
+        ws.append(headers)
+
+        for cell in ws[1]:  
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal="center")
+
+        total_pedidos = 0
+        total_ingreso = 0
+
+        # 🔹 Llenar datos en la tabla
+        for row in pedidos:
+            receta_nombre, total_pedidos_receta, total_ingreso_receta = row
+            ws.append([receta_nombre, total_pedidos_receta, round(total_ingreso_receta, 2)])
+
+            # Acumuladores para el total
+            total_pedidos += total_pedidos_receta
+            total_ingreso += total_ingreso_receta
+
+        # 🔹 Fila de totales en negrita
+        last_row = ws.max_row + 1
+        ws.append(["TOTAL", total_pedidos, round(total_ingreso, 2)])
+
+        for cell in ws[last_row]:
+            cell.font = Font(bold=True, size=12)
+
+        # 🔹 Ajustar tamaño de columnas automáticamente
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                try:
+                    max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+        # 🔹 Guardar el archivo Excel
+        file_path = f"reporte_pedidos_{fecha_desde}_a_{fecha_hasta}.xlsx"
+        wb.save(file_path)
+
+        conn.close()
+
+        return send_file(file_path, as_attachment=True)
+
+    except sqlite3.Error as e:
+        print("❌ Error al generar el reporte:", e)
+        return jsonify({"error": "Error al generar el reporte"}), 500
 
     
 
