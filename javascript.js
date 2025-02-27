@@ -631,9 +631,11 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Hubo un error al generar el reporte.");
         }
     }
-    
+
 
     document.getElementById("btnConfirmarPedidos").addEventListener("click", reportePedidos);
+
+
     
     
 
@@ -1825,6 +1827,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
         const nombre = document.getElementById("nombreReceta").value.trim();
         const precio = document.getElementById("precioReceta").value.trim();
+        const precio2 = document.getElementById("precioReceta2").value.trim();
     
         if (!nombre || !precio) {
             alert("Por favor, completa todos los campos.");
@@ -1839,6 +1842,7 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify({
                 nombre,
                 precio_venta: parseFloat(precio),
+                precio_venta_2: parseFloat(precio2),
             }),
         })
         .then(response => {
@@ -1862,7 +1866,6 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Selecciona una receta para modificar.");
             return;
         }
-        
     
         fetch("http://localhost:5000/api/recetas")
             .then(response => response.json())
@@ -1882,15 +1885,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     select.appendChild(option);
                 });
     
-                // Precargar los valores en los campos
-                document.getElementById("modifPrecioReceta").value = window.selectedReceta.precio_venta;
+                // ✅ Asegurar que el objeto tenga precio_venta_2 antes de asignarlo
+                document.getElementById("modifPrecioReceta").value = window.selectedReceta.precio_venta ?? 0;
+                document.getElementById("modifPrecioReceta2").value = window.selectedReceta.precio_venta_2 ?? 0; 
     
-                // Escuchar cambios en el select para actualizar el campo de precio dinámicamente
+                // ✅ Escuchar cambios en el select para actualizar el campo de precio dinámicamente
                 select.addEventListener("change", (event) => {
                     const selectedId = parseInt(event.target.value);
                     const selectedReceta = data.find(receta => receta.id === selectedId);
                     if (selectedReceta) {
-                        document.getElementById("modifPrecioReceta").value = selectedReceta.precio_venta;
+                        document.getElementById("modifPrecioReceta").value = selectedReceta.precio_venta ?? 0;
+                        document.getElementById("modifPrecioReceta2").value = selectedReceta.precio_venta_2 ?? 0;
                     }
                 });
     
@@ -1902,13 +1907,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
     
+    
     function modifyReceta(event) {
         event.preventDefault();
     
         const recetaId = document.getElementById("modifNombreReceta").value;
         const precio = document.getElementById("modifPrecioReceta").value.trim();
+        const precio2 = document.getElementById("modifPrecioReceta2").value.trim();
     
-        if (!recetaId || !precio) {
+        if (!recetaId || !precio || !precio2) {
             alert("Por favor, selecciona una receta y completa todos los campos.");
             return;
         }
@@ -1921,6 +1928,7 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify({
                 nombre: document.getElementById("modifNombreReceta").selectedOptions[0].text,
                 precio_venta: parseFloat(precio),
+                precio_venta_2: parseFloat(precio2),
             }),
         })
         .then(response => {

@@ -119,7 +119,7 @@ def get_recetas():
     
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, nombre, precio_venta FROM recetas")
+        cursor.execute("SELECT id, nombre, precio_venta, precio_venta_2 FROM recetas")
         recetas = cursor.fetchall()
         conn.close()
         return jsonify([dict(row) for row in recetas])
@@ -279,16 +279,16 @@ def agregar_receta():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO recetas (nombre, precio_venta)
-            VALUES (?, ?)
-        """, (data['nombre'], data['precio_venta']))
+            INSERT INTO recetas (nombre, precio_venta, precio_venta_2)
+            VALUES (?, ?, ?)
+        """, (data['nombre'], data['precio_venta'], data.get('precio_venta_2', 0)))  # Usa 0 si no se envía
         conn.commit()
         conn.close()
         return jsonify({"message": "Receta agregada correctamente"}), 201
     except sqlite3.Error as e:
         return jsonify({"error": "Error al agregar receta"}), 500
 
-# Modificar receta (nombre o precio)
+# Modificar receta (nombre o precios)
 @app.route('/api/recetas/<int:receta_id>', methods=['PUT'])
 def modificar_receta(receta_id):
     data = request.json
@@ -300,14 +300,15 @@ def modificar_receta(receta_id):
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE recetas
-            SET nombre = ?, precio_venta = ?
+            SET nombre = ?, precio_venta = ?, precio_venta_2 = ?
             WHERE id = ?
-        """, (data['nombre'], data['precio_venta'], receta_id))
+        """, (data['nombre'], data['precio_venta'], data['precio_venta_2'], receta_id))
         conn.commit()
         conn.close()
         return jsonify({"message": "Receta modificada correctamente"}), 200
     except sqlite3.Error as e:
         return jsonify({"error": "Error al modificar receta"}), 500
+
 
 # Eliminar receta
 @app.route('/api/recetas/<int:receta_id>', methods=['DELETE'])
