@@ -702,19 +702,27 @@ def generar_reporte_ventas():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Obtener parámetros de fecha del request
+    fecha_desde = request.args.get('desde')
+    fecha_hasta = request.args.get('hasta')
+
+    if not fecha_desde or not fecha_hasta:
+        return jsonify({"error": "Se requieren ambas fechas para generar el reporte"}), 400
+
     try:
-        # 🔹 Obtener detalles de ventas con nombres de recetas
+        # 🔹 Obtener detalles de ventas dentro del rango de fechas
         cursor.execute("""
             SELECT dv.venta_id, v.fecha_venta, r.nombre AS receta_nombre, 
                    dv.unidades, dv.precio_venta, v.medio_venta
             FROM detalle_ventas dv
             JOIN recetas r ON dv.receta_id = r.id
             JOIN ventas v ON dv.venta_id = v.id
-        """)
+            WHERE DATE(v.fecha_venta) BETWEEN DATE(?) AND DATE(?)
+        """, (fecha_desde, fecha_hasta))
         detalles = cursor.fetchall()
 
         if not detalles:
-            return jsonify({"error": "No hay datos disponibles"}), 404
+            return jsonify({"error": "No hay datos disponibles en el rango seleccionado"}), 404
 
         # 🔹 Crear archivo Excel
         wb = openpyxl.Workbook()
@@ -723,28 +731,28 @@ def generar_reporte_ventas():
         ws = wb.active
         ws.title = "Detalle Ventas"
 
-        # 🔹 Escribir encabezados con filtro
+        # 🔹 Escribir encabezados con formato
         headers = ["Venta", "Fecha", "ID", "Unidades", "Medio de Venta", 
                    "Costo Total Insumos", "Valor Venta", "Comisiones Venta",
                    "Ganancia Bruta", "Rentabilidad Bruta"]
         ws.append(headers)
 
-        # Aplicar formato de encabezado (negrita y alineación centrada)
         for cell in ws[1]:  
             cell.font = Font(bold=True)
             cell.alignment = Alignment(horizontal="center")
 
         # 🔹 Llenar datos
         medio_venta_count = {}  # Para la hoja de gráfico
+        total_costos = total_venta = total_comisiones = total_ganancia = 0
 
         for row in detalles:
             venta_id, fecha_venta, receta_nombre, unidades, precio_venta, medio_venta = row
 
-            # Convertir fecha al formato DD-MM-AAAA
-            fecha_venta = fecha_venta.split("T")[0]  # Elimina la hora
-            fecha_venta = "-".join(reversed(fecha_venta.split("-")))  # Convierte a DD-MM-YYYY
+            # Convertir fecha al formato DD-MM-YYYY
+            fecha_venta = fecha_venta.split("T")[0]
+            fecha_venta = "-".join(reversed(fecha_venta.split("-")))
 
-            # Obtener costos de insumos para esta receta
+            # Obtener costos de insumos
             cursor.execute("""
                 SELECT ri.insumo_id, ri.cantidad, i.precio_unitario
                 FROM receta_insumos ri
@@ -754,13 +762,17 @@ def generar_reporte_ventas():
             insumos = cursor.fetchall()
 
             costo_total_insumos = sum(insumo[1] * insumo[2] for insumo in insumos)
-
-            # Calcular comisión de venta
             comision_venta = 0.255 if medio_venta.lower() == "pedidosya" else 0
             ganancia_bruta = (precio_venta - costo_total_insumos) - (precio_venta * comision_venta)
             rentabilidad_bruta = (ganancia_bruta / costo_total_insumos) if costo_total_insumos > 0 else 0
 
-            # Contar medios de venta para el gráfico
+            # Acumuladores para la fila total
+            total_costos += costo_total_insumos * unidades
+            total_venta += precio_venta * unidades
+            total_comisiones += (comision_venta * precio_venta) * unidades
+            total_ganancia += ganancia_bruta * unidades
+
+            # Contar medios de venta para la hoja de gráficos
             if medio_venta in medio_venta_count:
                 medio_venta_count[medio_venta] += unidades
             else:
@@ -780,11 +792,23 @@ def generar_reporte_ventas():
         for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=10, max_col=10):
             for cell in row:
                 cell.number_format = "0.00%"
-        
+
+        # 🔹 Fila Total
+        last_row = ws.max_row + 1
+        ws.append(["", "", "", "TOTAL:", "", 
+                   round(total_costos, 2), round(total_venta, 2),
+                   round(total_comisiones, 2), round(total_ganancia, 2),
+                   f"=I{last_row}/F{last_row}"])
+
+        for cell in ws[last_row]:
+            cell.font = Font(bold=True, size=12)
+
+        ws[f"J{last_row}"].number_format = "0.00%"  # Formato de porcentaje en total rentabilidad
+
         # 🔹 Ajustar tamaño de columnas automáticamente
         for col in ws.columns:
             max_length = 0
-            col_letter = get_column_letter(col[0].column)  # Obtener letra de columna
+            col_letter = get_column_letter(col[0].column)
             for cell in col:
                 try:
                     max_length = max(max_length, len(str(cell.value)))
@@ -792,23 +816,8 @@ def generar_reporte_ventas():
                     pass
             ws.column_dimensions[col_letter].width = max_length + 2
 
-        # 🔹 Agregar Filtro Manual en la Tabla
+        # 🔹 Agregar filtro a la tabla
         ws.auto_filter.ref = f"A1:J{ws.max_row}"
-
-        # ======== 📌 TOTALIZADORES ===========
-        last_row = ws.max_row + 1  # Fila donde irá el total
-
-        ws.append(["", "", "", "", "TOTAL:", 
-                   f"=SUBTOTAL(9,F2:F{last_row-1})", f"=SUBTOTAL(9,G2:G{last_row-1})", 
-                   f"=SUBTOTAL(9,H2:H{last_row-1})", f"=SUBTOTAL(9,I2:I{last_row-1})", 
-                   f"=I{last_row}/F{last_row}"])
-
-        # Aplicar negrita y tamaño mayor en la fila total
-        for cell in ws[last_row]:
-            cell.font = Font(bold=True, size=12)
-
-        # Aplicar formato de porcentaje a la celda de total "Rentabilidad Bruta"
-        ws[f"J{last_row}"].number_format = "0.00%"
 
         # ======== 📌 HOJA 2: MEDIO DE VENTA ===========
         ws_chart = wb.create_sheet(title="Medio de Venta")
@@ -817,29 +826,25 @@ def generar_reporte_ventas():
         for medio, count in medio_venta_count.items():
             ws_chart.append([medio, count])
 
-        # 🔹 Crear gráfico de torta más grande y con mejoras visuales
+        # 🔹 Crear gráfico de torta
         pie = PieChart()
         labels = Reference(ws_chart, min_col=1, min_row=2, max_row=len(medio_venta_count) + 1)
         data = Reference(ws_chart, min_col=2, min_row=1, max_row=len(medio_venta_count) + 1)
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(labels)
         pie.title = "Distribución de Medios de Venta"
-        pie.width = 18  # Más ancho
-        pie.height = 12  # Más alto
+        pie.width = 18
+        pie.height = 12
 
-        # Agregar etiquetas solo con porcentaje
         from openpyxl.chart.label import DataLabelList
         pie.dataLabels = DataLabelList()
         pie.dataLabels.showPercent = True
-        pie.dataLabels.showLeaderLines = False
 
-        # Mover la leyenda a la derecha con más separación
-        pie.legend.position = "r"  # "r" significa derecha
+        pie.legend.position = "r"
+        ws_chart.add_chart(pie, "D6")
 
-        ws_chart.add_chart(pie, "D6")  # Ubicación del gráfico en la hoja
-
-        # 🔹 Guardar el archivo Excel con nombre correcto
-        file_path = "reporte_ventas_2.xlsx"
+        # 🔹 Guardar el archivo Excel
+        file_path = f"reporte_ventas_{fecha_desde}_a_{fecha_hasta}.xlsx"
         wb.save(file_path)
 
         conn.close()
@@ -849,6 +854,7 @@ def generar_reporte_ventas():
     except sqlite3.Error as e:
         print("❌ Error al generar el reporte:", e)
         return jsonify({"error": "Error al generar el reporte"}), 500
+
     
 @app.route('/api/reporte_clientes', methods=['GET'])
 def generar_reporte_clientes():

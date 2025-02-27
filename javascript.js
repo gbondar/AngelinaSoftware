@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalReportes = document.getElementById("modalReportes");
     const modalClientes = document.getElementById('modalClientes');
     const modalPedidos = document.getElementById("modalPedidos");
+    const modalAnalisis = document.getElementById("modalAnalisis");
+    const btnConfirmarAnalisis = document.getElementById("btnConfirmarAnalisis");
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
@@ -528,10 +530,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //MODULO REPORTES
 
+    async function descargarReporteVentas() {
+        const fechaDesde = document.getElementById("fechaDesdeAnalisis").value;
+        const fechaHasta = document.getElementById("fechaHastaAnalisis").value;
     
-
-
-    async function descargarReporte(apiUrl, nombreArchivo) {
+        if (!fechaDesde || !fechaHasta) {
+            alert("Por favor, selecciona ambas fechas.");
+            return;
+        }
+    
+        const apiUrl = `http://localhost:5000/api/reporte_ventas?desde=${fechaDesde}&hasta=${fechaHasta}`;
+        const nombreArchivo = `reporte_ventas_${fechaDesde}_a_${fechaHasta}.xlsx`;
+    
         try {
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error("Error al generar el reporte");
@@ -552,10 +562,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    
     // ✅ Asociar la función al botón
-    document.getElementById("btnReporteCurrent").addEventListener("click", function() {
-        descargarReporte("http://localhost:5000/api/reporte_ventas", "reporte_ventas.xlsx");
-    });
+    
+    document.getElementById("btnConfirmarAnalisis").addEventListener("click", descargarReporteVentas);
+
+     
 
     async function reporteCliente() {
         const fechaDesde = document.getElementById("fechaDesdeCliente").value;
@@ -598,6 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modalReportes.style.display="none";
     modalClientes.style.display = "none";
     modalPedidos.style.display = "none";
+    modalAnalisis.style.display = "none";
 
    
     modalRecetas.style.display = "none";
@@ -2032,6 +2045,23 @@ document.addEventListener("DOMContentLoaded", () => {
     //click cerrar reporte Pedidos fecha
     document.getElementById("btnCancelarPedidos").addEventListener("click", closePedidos)
 
+
+    //Open y cierre ventas
+
+    function openAnalisis(){
+        document.getElementById('modalAnalisis').style.display = "flex";
+    }
+
+    function closeAnalisis(){
+        document.getElementById('modalAnalisis').style.display = "none";
+    }
+
+    //click abrir reporte ventas fecha
+    document.getElementById("btnReporteCurrent").addEventListener("click", openAnalisis)
+
+    //click cerrar reporte venta fecha
+    document.getElementById("btnCancelarAnalisis").addEventListener("click", closeAnalisis)
+
     
 
 
@@ -2053,6 +2083,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('closeModalReportes').addEventListener('click',closeReportes);
     document.getElementById('closeModalCliente').addEventListener('click',closeClientes);
     document.getElementById('closeModalPedidos').addEventListener('click',closePedidos);
+    document.getElementById('closeModalAnalisis').addEventListener('click',closeAnalisis);
 
 
 
