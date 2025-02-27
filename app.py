@@ -850,6 +850,91 @@ def generar_reporte_ventas():
         print("❌ Error al generar el reporte:", e)
         return jsonify({"error": "Error al generar el reporte"}), 500
     
+@app.route('/api/reporte_clientes', methods=['GET'])
+def generar_reporte_clientes():
+    desde = request.args.get('desde')
+    hasta = request.args.get('hasta')
+
+    if not desde or not hasta:
+        return jsonify({"error": "Debe proporcionar un rango de fechas válido"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # 🔹 Obtener clientes con sus datos
+        cursor.execute("""
+            SELECT c.id AS cliente_id, c.nombre, c.celular
+            FROM clientes c
+            JOIN cliente_ventas cv ON c.id = cv.cliente_id
+            JOIN ventas v ON cv.venta_id = v.id
+            WHERE date(v.fecha_venta) BETWEEN date(?) AND date(?)
+            GROUP BY c.id
+        """, (desde, hasta))
+        clientes = cursor.fetchall()
+
+        if not clientes:
+            return jsonify({"error": "No hay clientes con ventas en el rango de fechas seleccionado"}), 404
+
+        # 🔹 Crear archivo Excel
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Reporte Clientes"
+
+        # 🔹 Encabezados
+        headers = ["Cliente", "Teléfono", "Cant. Ventas", "Monto Ventas"]
+        ws.append(headers)
+
+        for cell in ws[1]:  # Estilo para los encabezados
+            cell.font = Font(bold=True)
+            cell.alignment = Alignment(horizontal="center")
+
+        # 🔹 Llenar datos de clientes
+        for cliente in clientes:
+            cliente_id, nombre, celular = cliente
+
+            # Obtener cantidad de ventas
+            cursor.execute("""
+                SELECT COUNT(DISTINCT venta_id)
+                FROM cliente_ventas
+                WHERE cliente_id = ?
+            """, (cliente_id,))
+            cant_ventas = cursor.fetchone()[0] or 0
+
+            # Obtener monto total de ventas
+            cursor.execute("""
+                SELECT SUM(dv.subtotal)
+                FROM cliente_ventas cv
+                JOIN detalle_ventas dv ON cv.venta_id = dv.venta_id
+                WHERE cv.cliente_id = ?
+            """, (cliente_id,))
+            monto_ventas = cursor.fetchone()[0] or 0
+
+            ws.append([nombre, celular, cant_ventas, round(monto_ventas, 2)])
+
+        # 🔹 Ajustar ancho de columnas automáticamente
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                try:
+                    max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+        # 🔹 Guardar el archivo con fecha en el nombre
+        file_path = f"reporte_clientes_{desde}_a_{hasta}.xlsx"
+        wb.save(file_path)
+
+        conn.close()
+        return send_file(file_path, as_attachment=True)
+
+    except sqlite3.Error as e:
+        print("❌ Error al generar el reporte de clientes:", e)
+        return jsonify({"error": "Error al generar el reporte"}), 500
+
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

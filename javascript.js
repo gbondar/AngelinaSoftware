@@ -557,6 +557,38 @@ document.addEventListener("DOMContentLoaded", () => {
         descargarReporte("http://localhost:5000/api/reporte_ventas", "reporte_ventas.xlsx");
     });
 
+    async function reporteCliente() {
+        const fechaDesde = document.getElementById("fechaDesdeCliente").value;
+        const fechaHasta = document.getElementById("fechaHastaCliente").value;
+    
+        if (!fechaDesde || !fechaHasta) {
+            alert("Por favor, selecciona ambas fechas.");
+            return;
+        }
+    
+        try {
+            const response = await fetch(`http://localhost:5000/api/reporte_clientes?desde=${fechaDesde}&hasta=${fechaHasta}`);
+            if (!response.ok) throw new Error("Error al generar el reporte");
+    
+            // ✅ Descargar el archivo
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `reporte_clientes_${fechaDesde}_a_${fechaHasta}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("❌ Error al descargar el reporte:", error);
+            alert("Hubo un error al generar el reporte.");
+        }
+    }
+    
+    // ✅ Asociar la función al botón
+    document.getElementById("btnConfirmarCliente").addEventListener("click", reporteCliente);
+    
+
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
