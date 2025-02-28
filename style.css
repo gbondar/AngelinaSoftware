@@ -106,7 +106,7 @@ body {
 }
 
 /* Botón */
-button {
+button:not(.main-button) {
     padding: 10px 15px;
     font-size: 16px;
     cursor: pointer;
@@ -123,7 +123,7 @@ button {
     transition: transform 0.2s ease-in-out; /* Transición suave */
 }
 
-button:hover {
+button:not(.main-button):hover {
     transform: scale(1.05);
     transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
     background-color: #341d4f;
