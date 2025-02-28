@@ -519,6 +519,17 @@ label[for="recetaSelect"] {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
+.datos-cliente form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Mantiene separación entre inputs */
+    margin-top: 60px; /* Ajusta este valor según necesites */
+}
+
+.addClientesForm {
+    margin-top: 30px; /* Ajusta este valor para bajar más o menos los inputs */
+}
+
 /* Sección derecha: Nueva Venta */
 .venta-detalles {
     width: 60%;
