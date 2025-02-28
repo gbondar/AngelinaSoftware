@@ -1,13 +1,3 @@
-document.addEventListener("DOMContentLoaded", function () {
-    setTimeout(() => {
-        document.querySelectorAll(".modal").forEach(modal => {
-            modal.style.display = "none";
-            modal.style.visibility = "visible"; // Permite que se muestre después si es necesario
-            modal.style.opacity = "1"; // Asegura que no quede invisible cuando lo muestres
-        });
-    }, 50); // Pequeño delay para evitar que se rendericen en pantalla
-});
-
 document.addEventListener("DOMContentLoaded", () => {  
     const modal = document.getElementById("modal");
     const addModal = document.getElementById("addModal");
@@ -46,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalPedidos = document.getElementById("modalPedidos");
     const modalAnalisis = document.getElementById("modalAnalisis");
     const btnConfirmarAnalisis = document.getElementById("btnConfirmarAnalisis");
+    const alertaInsumos = document.getElementById("alertaInsumos")
 
     //TODO ESTO ES MODULO VENTAS
     verVenta.style.display = "none";
@@ -646,9 +637,89 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btnConfirmarPedidos").addEventListener("click", reportePedidos);
 
 
-    
-    
+    //----------------------------------------------FIN MODULO REPORTES------------------------------------------------------------
+    //---------------------------------------------MODULO ALERTA INSUMOS ----------------------------------------------------------
+    document.addEventListener("DOMContentLoaded", checkInsumos);
 
+    async function checkInsumos() {
+        try {
+            // 1️⃣ Fetch de insumos (stock disponible)
+            const responseInsumos = await fetch('http://localhost:5000/api/insumos');
+            const insumos = await responseInsumos.json();
+    
+            // 2️⃣ Fetch de recetas
+            const responseRecetas = await fetch('http://localhost:5000/api/recetas');
+            const recetas = await responseRecetas.json();
+    
+            let totalInsumosNecesarios = {};
+    
+            // 3️⃣ Recorrer todas las recetas y sumar los insumos necesarios
+            for (let receta of recetas) {
+                const responseRecetaInsumos = await fetch(`http://localhost:5000/api/receta_insumos/${receta.id}`);
+                const insumosReceta = await responseRecetaInsumos.json();
+    
+                insumosReceta.forEach(insumo => {
+                    if (!totalInsumosNecesarios[insumo.insumo]) {
+                        totalInsumosNecesarios[insumo.insumo] = 0;
+                    }
+                    totalInsumosNecesarios[insumo.insumo] += parseFloat(insumo.cantidad);
+                });
+            }
+    
+            console.log(totalInsumosNecesarios);
+    
+            // 4️⃣ Verificar si hay stock suficiente
+            let alertas = [];
+            insumos.forEach(insumo => {
+                let requerido = totalInsumosNecesarios[insumo.nombre] || 0;
+                let cantidadRedondeada = parseFloat(insumo.cantidad).toFixed(2); // Redondear a 2 decimales
+                if (insumo.cantidad < requerido) {
+                    alertas.push(`⚠️ Insumo **${insumo.nombre}** en cantidad crítica (${cantidadRedondeada} disponibles, necesita mínimo ${requerido}).`);
+                }
+            });
+    
+            // 5️⃣ Si hay alertas, mostrar el botón de alerta
+            if (alertas.length > 0) {
+                mostrarAlerta(alertas);
+            } else {
+                ocultarAlerta();
+            }
+    
+        } catch (error) {
+            console.error("Error al verificar insumos:", error);
+        }
+    }
+    
+    // ✅ Función para mostrar el botón de alerta
+    function mostrarAlerta(alertas) {
+        let alertaButton = document.getElementById("alertaInsumos");
+        let detalleAlertas = document.getElementById("detalleAlertas");
+    
+        // Mostrar el botón de alerta
+        alertaButton.style.display = "block";
+    
+        // Guardar las alertas en el div de detalles (pero mantenerlo oculto)
+        detalleAlertas.innerHTML = alertas.join("<br>");
+        detalleAlertas.style.display = "none";
+    
+        // Agregar evento para mostrar/ocultar el detalle al hacer clic
+        alertaButton.onclick = function () {
+            if (detalleAlertas.style.display === "none") {
+                detalleAlertas.style.display = "block";
+            } else {
+                detalleAlertas.style.display = "none";
+            }
+        };
+    }
+    
+    // ✅ Función para ocultar la alerta si no hay insumos críticos
+    function ocultarAlerta() {
+        document.getElementById("alertaInsumos").style.display = "none";
+        document.getElementById("detalleAlertas").style.display = "none";
+    }
+    
+    // Ejecutar el chequeo de insumos al cargar
+    checkInsumos();
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
@@ -1367,8 +1438,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Función para agregar insumos desde la Base de Datos (Con botón EDITAR)
   // ✅ Función para agregar insumos desde la Base de Datos (Con botón EDITAR)
     async function agregarFilaInsumoDesdeBD(insumoData) {
-        console.log("🟢 Agregando fila desde BD - Insumo Data:", insumoData);
-
+    
         const row = document.createElement("div");
         row.classList.add("fila-insumo");
 
