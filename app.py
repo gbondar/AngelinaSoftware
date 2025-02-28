@@ -763,7 +763,7 @@ def generar_reporte_ventas():
             insumos = cursor.fetchall()
 
             costo_total_insumos = sum(insumo[1] * insumo[2] for insumo in insumos)
-            comision_venta = 0.255 if medio_venta.lower() == "pedidosya" else 0
+            comision_venta = 0.3 if medio_venta.lower() == "pedidosya" else 0
             ganancia_bruta = (precio_venta - costo_total_insumos) - (precio_venta * comision_venta)
             rentabilidad_bruta = (ganancia_bruta / costo_total_insumos) if costo_total_insumos > 0 else 0
 
