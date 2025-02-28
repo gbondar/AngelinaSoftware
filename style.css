@@ -57,6 +57,7 @@ body {
     text-decoration: none;
     transition: transform 0.3s ease-in-out;
     padding-top: 20px; /* Espacio para el texto */
+    
 }
 
 /* Aumenta el tamaño del texto */
@@ -115,7 +116,11 @@ button {
     border-radius: 5px;
     transition: background-color 0.3s;
     font-family: 'Roboto', sans-serif !important;
-    border: 2px solid #e6d190;
+    box-shadow:
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
+    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
+    transition: transform 0.2s ease-in-out; /* Transición suave */
 }
 
 button:hover {
@@ -156,6 +161,10 @@ button:hover {
     left: 50%;
     transform: translate(-50%, -50%);
     position: absolute;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 
+    0 4px 6px rgba(0, 0, 0, 0.4), 
+    inset 0 2px 5px rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(0, 0, 0, 0.6); /* Bordes más marcados */
 }
 
 .modal-content h2 {
@@ -163,7 +172,7 @@ button:hover {
     padding: 12px 15px;
     margin: 0;
     margin-bottom: 10px;
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
     color: #5A3B81;
     text-align: center;
@@ -333,8 +342,11 @@ select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
+    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
+    transition: transform 0.2s ease-in-out; /* Transición suave */
 }
 
 #floatingButton:hover {
@@ -501,7 +513,52 @@ label[for="recetaSelect"] {
     left: 50%;
     transform: translate(-50%, -50%);
     position: absolute;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 
+    0 4px 6px rgba(0, 0, 0, 0.4), 
+    inset 0 2px 5px rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(0, 0, 0, 0.6); /* Bordes más marcados */
 }
+
+.modal-content-wide h2 {
+    background-color: #e6d190;
+    padding: 12px 15px;
+    margin: 0;
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #5A3B81;
+    text-align: center;
+    border-bottom: 1px solid #b0a08b;
+}
+
+.modal-content, .modal-content-wide {
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.7),  /* Sombra grande fuerte abajo */
+        0 5px 15px rgba(0, 0, 0, 0.6),  /* Segunda sombra más corta */
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
+    border: 3px solid rgba(0, 0, 0, 0.8); /* Bordes más gruesos */
+    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
+    transition: transform 0.2s ease-in-out; /* Transición suave */
+    padding-bottom: 40px; /* Aumentá este valor si querés más espacio */
+
+}
+
+/* Efecto al abrir el modal para que parezca que se infla */
+.modal-content-wide, .modal-content {
+    animation: inflateEffect 0.3s ease-out;
+}
+
+@keyframes inflateEffect {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
 
 /* Contenedor principal con dos columnas */
 .venta-container {
@@ -575,7 +632,6 @@ label[for="recetaSelect"] {
     height: 50px;
     background-color: #5A3B81; /* Violeta */
     color: white;
-    border: 2px solid #e6d190; /* Borde plateado */
     border-radius: 50%; /* Lo hace circular */
     font-size: 24px;
     font-weight: bold;
@@ -583,7 +639,10 @@ label[for="recetaSelect"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow:
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
+    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
@@ -591,7 +650,10 @@ label[for="recetaSelect"] {
 .add-circle-btn:hover {
     background-color: #7D58B3; /* Un violeta más claro */
     transform: scale(1.1);
-    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+    box-shadow:
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
+    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
 }
 
 /* Efecto al hacer clic */
