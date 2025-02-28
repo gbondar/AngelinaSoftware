@@ -1,4 +1,14 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+        document.querySelectorAll(".modal").forEach(modal => {
+            modal.style.display = "none";
+            modal.style.visibility = "visible"; // Permite que se muestre después si es necesario
+            modal.style.opacity = "1"; // Asegura que no quede invisible cuando lo muestres
+        });
+    }, 50); // Pequeño delay para evitar que se rendericen en pantalla
+});
+
+document.addEventListener("DOMContentLoaded", () => {  
     const modal = document.getElementById("modal");
     const addModal = document.getElementById("addModal");
     const modifModal = document.getElementById("modifModal");
