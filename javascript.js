@@ -875,7 +875,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${receta.nombre}</td>
-                <td>${receta.precio_venta}</td>
+                <td>$${receta.precio_venta.toFixed(2)}</td>
+                <td>$${receta.precio_venta_2.toFixed(2)}</td>
             `;
     
             // Evento para seleccionar una fila
@@ -887,13 +888,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.selectedReceta = {
                     id: receta.id,
                     nombre: receta.nombre,
-                    precio_venta: receta.precio_venta
+                    precio_venta: receta.precio_venta,
+                    precio_venta_2: receta.precio_venta_2
                 };
             });
     
             recetasContainer.appendChild(row);
         });
     }
+    
     
     
 
