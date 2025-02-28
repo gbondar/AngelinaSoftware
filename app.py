@@ -658,12 +658,15 @@ def actualizar_insumos():
                 print("❌ Error: Falta 'insumo_id' o 'cantidad' en:", item)
                 return jsonify({"error": "Faltan datos en la actualización de insumos"}), 400
 
-            # Actualizar el stock del insumo
+            # Actualizar el stock del insumo sin permitir valores negativos
             cursor.execute("""
                 UPDATE insumos
-                SET cantidad = cantidad - ?
+                SET cantidad = CASE 
+                    WHEN cantidad - ? < 0 THEN 0 
+                    ELSE cantidad - ? 
+                END
                 WHERE id = ?
-            """, (item['cantidad'], item['insumo_id']))
+            """, (item['cantidad'], item['cantidad'], item['insumo_id']))
 
         conn.commit()
         conn.close()
@@ -672,6 +675,7 @@ def actualizar_insumos():
     except sqlite3.Error as e:
         print("❌ Error al actualizar insumos:", e)
         return jsonify({"error": "Error al actualizar insumos"}), 500
+
     
 # ✅ DELETE para eliminar una venta y sus detalles
 @app.route("/api/ventas/<int:venta_id>", methods=["DELETE"])
@@ -697,7 +701,10 @@ def eliminar_venta(venta_id):
     except sqlite3.Error as e:
         print("❌ Error al eliminar la venta:", e)
         return jsonify({"error": "Error al eliminar la venta"}), 500
-    
+
+
+#REPORTES 
+
 @app.route('/api/reporte_ventas', methods=['GET'])
 def generar_reporte_ventas():
     conn = get_db_connection()
