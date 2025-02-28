@@ -338,24 +338,13 @@
                 <div class="datos-cliente">
                     <h2>Cliente</h2>
                     <form id="addClientesForm">
+                        <label for="fechaVenta">Fecha Venta:</label>
+                        <input type="datetime-local" id="fechaVenta">
                         <label for="nombreCliente">Nombre:</label>
                         <input type="text" id="nombreCliente">
                         
                         <label for="celularCliente">Celular:</label>
                         <input type="number" id="celularCliente">
-                    </form>
-                    <h2>Info</h2>
-                    <form id="addVentasForm">
-                        <label for="fechaVenta">Fecha Venta:</label>
-                        <input type="datetime-local" id="fechaVenta">
-                        
-                        <label for="medioVenta">Medio de venta:</label>
-                        <select id="medioVenta" required>
-                            <option value="">Selecciona una opción</option>
-                            <option value="WhatsApp">WhatsApp</option>
-                            <option value="PedidosYa">Pedidos Ya</option>
-                            
-                        </select>
                     </form>
                 </div>
 
@@ -364,6 +353,13 @@
                     <!-- Sección de Productos -->
                     <h2>Detalle</h2>
                     <form id="addDetalleForm">
+                        <label for="medioVenta">Medio de venta:</label>
+                        <select id="medioVenta" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="PedidosYa">Pedidos Ya</option>
+                            
+                        </select>
                         <label for="recetaVenta">Receta:</label>
                         <select id="recetaVenta" required>
                             <option value="">Selecciona una receta</option>
@@ -373,16 +369,7 @@
                         <label for="cantidadVenta">Cantidad:</label>
                         <input type="number" id="cantidadVenta">
                         <label for="precioVenta">Precio:</label>
-                        <!-- 🔹 Radio buttons para elegir tipo de precio -->
-                        <div class="checkbox-group">
-                            <input type="radio" id="tipoPrecio1" name="tipoPrecio" />
-                            <label for="tipoPrecio1">Pedidos Ya </label>
-                        
-                            <input type="radio" id="tipoPrecio2" name="tipoPrecio" />
-                            <label for="tipoPrecio2">Descuento </label>
-                        </div>
-                        <input type="number" id="precioVenta">
-                        
+                        <input type="number" id="precioVenta">   
                     <div class="modal-buttons">
                         <button type="button" id="btnAgregarDetalle">Agregar</button>
                     </div>
