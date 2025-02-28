@@ -720,6 +720,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Ejecutar el chequeo de insumos al cargar
     checkInsumos();
+    // Ejecutar checkInsumos cada 15 segundos
+    setInterval(checkInsumos, 900000);
+
+    //------------------------------------------------------------FINALIZA CHECK INSUMOS ------------------------------------------------------
 
     // Asegurar que los modales inicien cerrados
     modal.style.display = "none";
