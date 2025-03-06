@@ -10,16 +10,55 @@ from flask_cors import CORS
 from openpyxl.styles import Font, Alignment, NamedStyle
 from openpyxl.utils import get_column_letter
 from openpyxl.chart import PieChart, Reference
-
+import shutil
 
 app = Flask(__name__)
 CORS(app)
 
+DB_PATH = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\sistema_ventas.db'
+BACKUP_FOLDER = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\backups'
+LOG_BACKUP = os.path.join(BACKUP_FOLDER, "ultimo_backup.txt")  # Archivo para registrar el último backup
+
+def backup_db():
+    """Realiza un backup de la base de datos solo una vez por día."""
+    try:
+        if not os.path.exists(BACKUP_FOLDER):
+            os.makedirs(BACKUP_FOLDER)
+
+        # Obtener la fecha actual
+        hoy = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        # Revisar si ya se hizo un backup hoy
+        if os.path.exists(LOG_BACKUP):
+            with open(LOG_BACKUP, "r") as f:
+                ultima_fecha = f.read().strip()
+                if ultima_fecha == hoy:
+                    print(f"⏳ Backup ya realizado hoy ({hoy}), no se repite.")
+                    return  # Salir si ya hay backup del día
+
+        # Nombre del backup basado en la fecha
+        backup_path = os.path.join(BACKUP_FOLDER, f"backup_{hoy}.db")
+
+        # Copiar la base de datos
+        shutil.copy2(DB_PATH, backup_path)
+
+        # Registrar que se hizo el backup
+        with open(LOG_BACKUP, "w") as f:
+            f.write(hoy)
+
+        print(f"✅ Backup realizado: {backup_path}")
+
+    except Exception as e:
+        print(f"❌ Error en el backup: {e}")
+
+# Llamar a la función de backup al iniciar el programa
+backup_db()
+
+
 #Conecta la BBDD por primera vez
 def get_db_connection():
-    db_path = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\sistema_ventas.db'
     try:
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row  # Permite acceder a las columnas por nombre
         print("Conexión exitosa a la base de datos")
         return conn
