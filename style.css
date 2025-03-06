@@ -42,8 +42,9 @@ body {
 }
 
 .main-button {
-    width: 250px; /* Ancho fijo */
-    height: 350px; /* Alto fijo */
+    width: 100%; /* Se ajusta al contenedor */
+    max-width: 250px; /* Evita que sea demasiado grande */
+    aspect-ratio: 5 / 7; /* Mantiene la proporción de aspecto */
     background-size: contain;
     background-repeat: no-repeat;
     background-position: bottom center; /* Mueve la imagen hacia abajo */
@@ -750,58 +751,17 @@ label[for="recetaSelect"] {
     display: none;
 }
 
-.main-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 30%; /* Mantiene solo la parte superior con mármol */
-    background-image: url('https://i.postimg.cc/Wp8hFB8V/close-up-white-marble-textured-wall.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    opacity: 0.9; /* Suaviza la textura */
-    z-index: 0; /* Mantiene el mármol arriba del botón, pero sin cubrir la imagen */
+@media (max-height: 960px) {
+    /* Reducir el tamaño de los textos en un 25% */
+    .main-button span {
+        font-size: 40px; /* Reduce en 25% */
+    }
 }
 
-/* 🚀 Elimina el efecto en hover que cubre la imagen */
-.main-button:hover::before {
-    opacity: 0.9; /* Mantiene el mismo nivel de opacidad */
-    height: 30%; /* Evita que cubra toda la imagen */
-    transition: none; /* Evita animaciones innecesarias */
-}
 
 /* Media Queries para mejor responsividad */
 @media (max-width: 820px) {
-    .main-container {
-        grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-        max-width: 600px;
-    }
 
-    .main-button {
-        height: auto;
-        aspect-ratio: 5 / 8;
-    }
-}
-
-@media (max-width: 516px) {
-    .main-container {
-        grid-template-columns: 1fr; /* Una columna */
-        width: 80%;
-    }
-
-    .main-button span {
-        font-size: clamp(14px, 5vw, 32px); /* Letra más ajustada */
-    }
-}
-
-
-
-/* Responsive para pantallas menores a 820px */
-@media (max-width: 820px) {
     .modal-content {
         width: 60%;
     }
@@ -813,7 +773,7 @@ label[for="recetaSelect"] {
     .main-container {
         display: grid;
         grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-        grid-gap: 10px; /* Reducimos el espacio entre botones */
+        grid-gap: 80px; /* Reducimos el espacio entre botones */
         justify-content: center; /* Centrar horizontalmente */
         align-items: center;
         align-content: center; /* Mantiene el conjunto alineado verticalmente */
@@ -824,23 +784,42 @@ label[for="recetaSelect"] {
         height: calc(100vh - 120px); /* Ajuste dinámico según la pantalla */
     }
 
-    /* Ajustar el tamaño de los botones */
-    .main-button {
-        width: 180px; /* Tamaño proporcional */
-        height: 280px;
-        background-size: contain;
+   /* Subir los textos sin modificar la estructura HTML */
+    .main-button span {
+        font-size: clamp(30px, 5vw, 32px); /* Tamaño adaptable */
+        display: block;
+        position: relative;
+        top: -50px; /* 🔹 Sube el texto sin tocar el botón */
+        text-align: center;
+        width: 100%;
+        z-index: 2; /* Mantiene el texto visible */
     }
 
-    /* Ajustar el texto dentro del botón */
-    .main-button span {
-        font-size: 22px;
-        position: relative;
-        padding-top: 5px;
-        z-index: 2 !important;
+    .main-button {
+        max-height: 200px;
+        aspect-ratio: 5 / 7.5;
     }
+
 }
-    
+
 @media (max-width: 516px) {
+  
+    .main-button {
+        max-height: 200px;
+        aspect-ratio: 5 / 7;
+    }
+
+    /* Subir los textos sin modificar la estructura HTML */
+    .main-button span {
+        font-size: clamp(30px, 5vw, 32px); /* Tamaño adaptable */
+        display: block;
+        position: relative;
+        top: -50px; /* 🔹 Sube el texto sin tocar el botón */
+        text-align: center;
+        width: 100%;
+        z-index: 2; /* Mantiene el texto visible */
+    }
+
     /* Ajustar botones de los modales */
     .modal-buttons {
         display: flex;
@@ -855,5 +834,6 @@ label[for="recetaSelect"] {
         padding: 8px 10px; /* Se ajusta sin perder usabilidad */
         min-width: auto; /* Evita que se desborden */
     }
+    
 }
 
