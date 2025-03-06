@@ -671,7 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // 4️⃣ Verificar si hay stock suficiente
             let alertas = [];
             insumos.forEach(insumo => {
-                let requerido = totalInsumosNecesarios[insumo.nombre] || 0;
+                let requerido = (totalInsumosNecesarios[insumo.nombre] || 0).toFixed(2);
                 let cantidadRedondeada = parseFloat(insumo.cantidad).toFixed(2); // Redondear a 2 decimales
                 if (insumo.cantidad < requerido) {
                     alertas.push(`⚠️ Insumo **${insumo.nombre}** en cantidad crítica (${cantidadRedondeada} disponibles, necesita mínimo ${requerido}).`);
