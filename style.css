@@ -64,7 +64,7 @@ body {
 
 /* Ajustar el texto para que esté dentro del botón */
 .main-button span {
-    font-size: 50px;
+    font-size: 50px; 
     color: #5A3B81;
     font-weight: bold;
     text-shadow: 1px 1px 2px rgb(0, 0, 0);
@@ -751,10 +751,10 @@ label[for="recetaSelect"] {
     display: none;
 }
 
-@media (max-height: 960px) {
+@media (max-width: 960px) {
     /* Reducir el tamaño de los textos en un 25% */
     .main-button span {
-        font-size: 40px; /* Reduce en 25% */
+        font-size: clamp(30px, 4vw, 40px); /* 🔹 Reduce 25% en alturas menores */
     }
 }
 
@@ -789,14 +789,14 @@ label[for="recetaSelect"] {
         font-size: clamp(30px, 5vw, 32px); /* Tamaño adaptable */
         display: block;
         position: relative;
-        top: -50px; /* 🔹 Sube el texto sin tocar el botón */
+        top: -45px; /* 🔹 Sube el texto sin tocar el botón */
         text-align: center;
         width: 100%;
         z-index: 2; /* Mantiene el texto visible */
     }
 
     .main-button {
-        max-height: 200px;
+        max-height: 210px;
         aspect-ratio: 5 / 7.5;
     }
 
@@ -805,7 +805,7 @@ label[for="recetaSelect"] {
 @media (max-width: 516px) {
   
     .main-button {
-        max-height: 200px;
+        max-height: 210px;
         aspect-ratio: 5 / 7;
     }
 
@@ -814,7 +814,7 @@ label[for="recetaSelect"] {
         font-size: clamp(30px, 5vw, 32px); /* Tamaño adaptable */
         display: block;
         position: relative;
-        top: -50px; /* 🔹 Sube el texto sin tocar el botón */
+        top: -45px; /* 🔹 Sube el texto sin tocar el botón */
         text-align: center;
         width: 100%;
         z-index: 2; /* Mantiene el texto visible */
