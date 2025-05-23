@@ -17,7 +17,7 @@ CORS(app)
 
 DB_PATH = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\sistema_ventas.db'
 BACKUP_FOLDER = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\backups'
-LOG_BACKUP = os.path.join(BACKUP_FOLDER, "ultimo_backup.txt")  # Archivo para registrar el último backup
+LOG_BACKUP = os.path.join(BACKUP_FOLDER, "ultimo_backup.txt")  # Registro el último backup
 
 def backup_db():
     """Realiza un backup de la base de datos solo una vez por día."""
@@ -46,10 +46,10 @@ def backup_db():
         with open(LOG_BACKUP, "w") as f:
             f.write(hoy)
 
-        print(f"✅ Backup realizado: {backup_path}")
+        print(f"Backup realizado: {backup_path}")
 
     except Exception as e:
-        print(f"❌ Error en el backup: {e}")
+        print(f" Error en el backup: {e}")
 
 # Llamar a la función de backup al iniciar el programa
 backup_db()
@@ -59,7 +59,7 @@ backup_db()
 def get_db_connection():
     try:
         conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row  # Permite acceder a las columnas por nombre
+        conn.row_factory = sqlite3.Row  
         print("Conexión exitosa a la base de datos")
         return conn
     except sqlite3.Error as e:
@@ -80,7 +80,7 @@ def get_insumos():
         conn.close()
         print("Datos obtenidos de la base de datos:", insumos)
 
-        # Convertir a diccionario para una mejor compatibilidad con JSON
+        # Convierto a diccionario para JSON
         insumos_dict = [dict(row) for row in insumos]
         return jsonify(insumos_dict)
     except sqlite3.Error as e:
@@ -187,9 +187,9 @@ def get_receta_insumos(receta_id):
         conn.close()
 
         if not insumos:
-            return jsonify([])  # Si la receta no tiene insumos, devolvemos una lista vacía
+            return jsonify([])  
 
-        return jsonify([dict(row) for row in insumos])  # Convertimos a JSON
+        return jsonify([dict(row) for row in insumos])  
 
     except sqlite3.Error as e:
         return jsonify({"error": "Error al obtener los insumos de la receta"}), 500
@@ -222,22 +222,22 @@ def convertir_unidad(cantidad, unidad_origen, unidad_destino):
         ("Gr", "Kg"): 0.001,
         ("Lt", "Ml"): 1000,
         ("Ml", "Lt"): 0.001,
-        ("Unidades", "Unidades"): 1  # No cambia
+        ("Unidades", "Unidades"): 1  
     }
 
     if (unidad_origen, unidad_destino) in conversiones:
         return cantidad * conversiones[(unidad_origen, unidad_destino)]
     else:
-        return None  # Conversión no válida
+        return None  
 
 @app.route('/api/receta_insumos/<int:receta_id>', methods=['PUT'])
 def actualizar_receta_insumos(receta_id):
-    data = request.json  # Recibir lista de insumos desde el frontend
+    data = request.json  
 
     print("🔹 Receta ID recibido:", receta_id)
     print("🔹 Datos recibidos:", data)
 
-    if not isinstance(data, list):  # Validar que sea una lista
+    if not isinstance(data, list):  
         return jsonify({"error": "Los datos deben ser una lista de insumos"}), 400
 
     conn = get_db_connection()
@@ -250,7 +250,7 @@ def actualizar_receta_insumos(receta_id):
             unidad_medida = insumo.get("unidad_medida")
 
             if not all([insumo_id, cantidad, unidad_medida]):
-                continue  # Si falta algún dato, omitir
+                continue  
 
             print(f"Procesando insumo: ID={insumo_id}, Cantidad={cantidad}, Unidad={unidad_medida}")
 
@@ -518,7 +518,7 @@ def get_ventas():
         ventas_list = []
         for row in ventas:
             ventas_list.append({
-                "venta_id": row["venta_id"],  # ✅ Ahora se devuelve el ID de la venta
+                "venta_id": row["venta_id"],  
                 "fecha": row["fecha_venta"],
                 "unidades_totales": row["unidades_totales"],
                 "total": row["total"]
@@ -620,7 +620,7 @@ def agregar_detalle_ventas():
     except sqlite3.Error as e:
         return jsonify({"error": "Error al insertar detalles de venta"}), 500
     
-# ✅ PUT para actualizar o agregar cliente
+# PUT para actualizar o agregar cliente
 @app.route("/api/clientes", methods=["PUT"])
 def upsert_cliente():
     data = request.json
@@ -628,7 +628,7 @@ def upsert_cliente():
     celular = data.get("celular", "").strip()
 
     if not nombre and not celular:
-        return jsonify({"message": "No se ingresó cliente, no se registrará"}), 200  # No hace nada
+        return jsonify({"message": "No se ingresó cliente, no se registrará"}), 200  
 
     if not nombre:
         nombre = "ANON"  # Si no hay nombre, lo registramos como ANON
@@ -636,14 +636,14 @@ def upsert_cliente():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 🔹 Verificar si el cliente ya existe por número de celular
+    # Verificar si el cliente ya existe por número de celular
     cursor.execute("SELECT id FROM clientes WHERE celular = ?", (celular,))
     cliente = cursor.fetchone()
 
     if cliente:
         cliente_id = cliente["id"]
     else:
-        # 🔹 Insertar nuevo cliente
+        #  Insertar nuevo cliente
         cursor.execute("INSERT INTO clientes (nombre, celular) VALUES (?, ?)", (nombre, celular))
         cliente_id = cursor.lastrowid  # Obtener el ID recién generado
 
@@ -653,7 +653,7 @@ def upsert_cliente():
     return jsonify({"cliente_id": cliente_id}), 200  # Devuelve el ID del cliente registrado
 
 
-# ✅ PUT para asociar venta con cliente en cliente_ventas
+#  PUT para asociar venta con cliente en cliente_ventas
 @app.route("/api/cliente_ventas", methods=["PUT"])
 def asociar_cliente_venta():
     data = request.json
@@ -666,7 +666,7 @@ def asociar_cliente_venta():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 🔹 Insertar relación en cliente_ventas si no existe
+    # Insertar relación en cliente_ventas si no existe
     cursor.execute(
         "INSERT OR IGNORE INTO cliente_ventas (cliente_id, venta_id) VALUES (?, ?)",
         (cliente_id, venta_id)
@@ -716,7 +716,7 @@ def actualizar_insumos():
         return jsonify({"error": "Error al actualizar insumos"}), 500
 
     
-# ✅ DELETE para eliminar una venta y sus detalles
+# DELETE para eliminar una venta y sus detalles
 @app.route("/api/ventas/<int:venta_id>", methods=["DELETE"])
 def eliminar_venta(venta_id):
     conn = get_db_connection()
@@ -778,7 +778,7 @@ def generar_reporte_ventas():
         ws = wb.active
         ws.title = "Detalle Ventas"
 
-        # 🔹 Escribir encabezados con formato
+        
         headers = ["Venta", "Fecha", "ID", "Unidades", "Medio de Venta", 
                    "Costo Total Insumos", "Valor Venta", "Comisiones Venta",
                    "Ganancia Bruta", "Rentabilidad Bruta"]

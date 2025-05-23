@@ -319,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // 🔹 Obtener insumos usados en esta receta
             const responseRecetaInsumos = await fetch(`http://localhost:5000/api/receta_insumos/${recetaId}`);
             const recetaInsumos = await responseRecetaInsumos.json();
-            console.log(`📩 Insumos para receta ID ${recetaId}:`, recetaInsumos);
 
     
             if (!responseRecetaInsumos.ok) {
@@ -364,7 +363,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
     
             const ventaId = resultVenta.venta_id;
-            console.log(`✅ Venta creada con ID: ${ventaId}`);
     
             // ✅ 2. Enviar los detalles de la venta
             const responseDetalles = await fetch("http://localhost:5000/api/detalle_ventas", {
@@ -381,7 +379,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
     
-            console.log("✅ Detalles de venta agregados:", resultDetalles);
     
             // ✅ 3. Actualizar los insumos
             if (insumosAActualizar.length > 0) {
@@ -399,7 +396,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
     
-                console.log("✅ Insumos actualizados correctamente.");
             }
     
             // ✅ 4. Registrar cliente si corresponde
@@ -422,7 +418,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
     
                 const clienteId = resultCliente.cliente_id;
-                console.log(`✅ Cliente registrado con ID: ${clienteId}`);
     
                 // ✅ 5. Asociar cliente con la venta
                 const clienteVentaResponse = await fetch("http://localhost:5000/api/cliente_ventas", {
@@ -439,7 +434,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
     
-                console.log("✅ Cliente asociado a la venta.");
             }
     
             alert("✅ Venta registrada correctamente");
@@ -666,7 +660,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
     
-            console.log(totalInsumosNecesarios);
     
             // 4️⃣ Verificar si hay stock suficiente
             let alertas = [];
@@ -828,7 +821,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return response.json();
             })
             .then(data => {
-                console.log("Recetas obtenidas:", data);
                 renderRecetasTable(data); // Asegúrate de tener una función específica para recetas
                 openModalRecetas(); // Abre el modal correcto
             })
@@ -1098,14 +1090,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function closeAddModal() {
-        addModal.style.display = "none";
-    }
-
-    function closeModalRecetas() {
-        modalRecetas.style.display = "none";
-    }
-
+   
     function closeElimModalRecetas() {
         elimModalRecetas.style.display = "none";
     }
@@ -1516,7 +1501,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ Función para agregar insumos manualmente (Con botón ELIMINAR)
     async function agregarFilaInsumoManual() {
-        console.log("🟢 Agregando fila manualmente");
 
         const row = document.createElement("div");
         row.classList.add("fila-insumo");
@@ -1529,7 +1513,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .map(select => select.value)
             .filter(value => value !== "");
 
-        console.log("🔎 Insumos ya en receta:", insumosSeleccionados);
 
         // Crear el select de insumo (editable)
         const selectInsumo = document.createElement("select");
@@ -2209,6 +2192,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btnCancelarAnalisis").addEventListener("click", closeAnalisis)
 
     
+     function closeAddModal() {
+        addModal.style.display = "none";
+    }
+
+    function closeModalRecetas() {
+        modalRecetas.style.display = "none";
+    }
 
 
 

@@ -4,7 +4,7 @@
     height: 100px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Centra el contenido */
+    justify-content: center; 
     padding: 0;
     margin: 0;
     position: fixed;
@@ -12,7 +12,7 @@
     left: 0;
 }
 .logo {
-    width: 220px; /* Tamaño más pequeño */
+    width: 220px; 
     height: auto;
     left: 10;
 }
@@ -24,7 +24,7 @@ body {
     background-color: #F4EFE9; /* Color de respaldo si la imagen no carga */
     color: black;
     padding: 20px;
-    margin: 0; /* Asegura que no haya margen extra */
+    margin: 0; 
     overflow: hidden;
 
 }
@@ -33,21 +33,21 @@ body {
 
 .main-container {
     display: flex;
-    flex-wrap: nowrap; /* Mantiene los botones en una sola fila */
+    flex-wrap: nowrap; 
     justify-content: center;
     align-items: center;
-    height: 115vh; /* Centra verticalmente */
+    height: 115vh; 
     gap: 40px;
-    margin-top: -40px; /* 🔹 Subir los botones */
+    margin-top: -40px; 
 }
 
 .main-button {
-    width: 100%; /* Se ajusta al contenedor */
-    max-width: 250px; /* Evita que sea demasiado grande */
-    aspect-ratio: 5 / 7; /* Mantiene la proporción de aspecto */
+    width: 100%; 
+    max-width: 250px; 
+    aspect-ratio: 5 / 7; 
     background-size: contain;
     background-repeat: no-repeat;
-    background-position: bottom center; /* Mueve la imagen hacia abajo */
+    background-position: bottom center; 
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -55,14 +55,14 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Coloca el texto arriba */
+    justify-content: flex-start; 
     text-decoration: none;
     transition: transform 0.3s ease-in-out;
-    padding-top: 50px; /* Espacio para el texto */
-    overflow: hidden; /* Asegura que todo quede dentro */
+    padding-top: 50px; 
+    overflow: hidden; 
 }
 
-/* Ajustar el texto para que esté dentro del botón */
+
 .main-button span {
     font-size: 50px; 
     color: #5A3B81;
@@ -70,7 +70,7 @@ body {
     text-shadow: 1px 1px 2px rgb(0, 0, 0);
     text-align: center;
     position: absolute;
-    top: 20px; /* Lo posiciona justo arriba de la imagen */
+    top: 20px; 
     width: 100%;
     background: none;
 }
@@ -85,9 +85,9 @@ body {
     font-weight: bold;
     text-align: center;
     position: absolute;
-    top: -40px; /* Ajusta la posición para que quede sobre la imagen */
+    top: -40px; 
     width: 100%;
-    background: none; /* Elimina el fondo violeta */
+    background: none; 
 }
 
 
@@ -123,21 +123,21 @@ button {
     transition: background-color 0.3s;
     font-family: 'Roboto', sans-serif !important;
     box-shadow:
-        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
-        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
-    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
-    transition: transform 0.2s ease-in-out; /* Transición suave */
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), 
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); 
+    border-radius: 30px; 
+    transition: transform 0.2s ease-in-out; 
 }
 
 .main-button {
    
     box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.5),  /* Sombra exterior grande */
-    0 4px 10px rgba(0, 0, 0, 0.3),  /* Segunda sombra más nítida */
-    inset 0 -10px 15px rgba(0, 0, 0, 0.7),  /* Profundidad interna */
-    inset 0 5px 15px rgba(255, 255, 255, 0.4),  /* Luz superior */
-    inset 0 3px 5px rgba(255, 255, 255, 0.3); /* Detalle de luz */
-    border-radius: 20px; /* Bordes redondeados para suavizar */
+    0 10px 25px rgba(0, 0, 0, 0.5),  
+    0 4px 10px rgba(0, 0, 0, 0.3),  
+    inset 0 -10px 15px rgba(0, 0, 0, 0.7), 
+    inset 0 5px 15px rgba(255, 255, 255, 0.4),  
+    inset 0 3px 5px rgba(255, 255, 255, 0.3); 
+    border-radius: 20px; 
 }
 
 
@@ -166,7 +166,7 @@ button:hover {
 
 /* Contenido del modal */
 .modal-content {
-    max-height: 90vh; /* Evita que se desborde de la pantalla */
+    max-height: 90vh; 
     overflow-y: auto; /* Scroll vertical cuando es necesario */
     position: relative;
     background-color: #e6d190;
@@ -183,7 +183,7 @@ button:hover {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 
     0 4px 6px rgba(0, 0, 0, 0.4), 
     inset 0 2px 5px rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(0, 0, 0, 0.6); /* Bordes más marcados */
+    border: 2px solid rgba(0, 0, 0, 0.6);
 }
 
 .modal-content h2 {
@@ -329,9 +329,8 @@ select:focus {
     background-image: url('https://i.postimg.cc/t7GsZnHx/DALL-E-2025-02-05-16-29-43-A-black-and-white-3-D-minimalist-illustration-of-a-spreadsheet-or-data-s.webp');
 }
 
-/* Asegurar que el select tenga estilos consistentes */
 #addModal select, #modifModal select {
-    font-size: 16px;  /* Aumentar tamaño del texto */
+    font-size: 16px;  
     padding: 8px;  
     border-radius: 5px;  
     border: 1px solid #ccc;
@@ -340,8 +339,8 @@ select:focus {
 
 /* Modificar el menú desplegable (dropdown) */
 #addModal select option, #modifModal select option {
-    font-size: 18px;  /* Aumenta el tamaño del texto en el menú */
-    padding: 12px;    /* Más espacio en cada opción */
+    font-size: 18px;  
+    padding: 12px;    
 }
 
 /* Estilos para el botón flotante "+" */
@@ -362,14 +361,14 @@ select:focus {
     align-items: center;
     justify-content: center;
     box-shadow:
-        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
-        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
-    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
-    transition: transform 0.2s ease-in-out; /* Transición suave */
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), 
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); 
+    border-radius: 30px;
+    transition: transform 0.2s ease-in-out; 
 }
 
 #floatingButton:hover {
-    background-color: #9c27b0; /* Violeta más claro */
+    background-color: #9c27b0; 
     transform: scale(1.1);
 }
 
@@ -378,7 +377,7 @@ select:focus {
 }
 
 #btnAgregarNuevoInsumo {
-    margin-top: 20px; /* Ajusta el valor según la distancia deseada */
+    margin-top: 20px; 
 }
 
 /* Contenedor de los insumos en el modal */
@@ -390,7 +389,7 @@ select:focus {
     margin-top: 10px;
 }
 
-/* Fila de insumos (cada insumo con sus inputs) */
+
 .fila-insumo {
     display: flex;
     gap: 10px;
@@ -399,7 +398,7 @@ select:focus {
 
 label[for="recetaSelect"] {
     display: block;
-    margin-bottom: 15px; /* Espacio entre el título y el select */
+    margin-bottom: 15px; 
 }
 
 
@@ -408,9 +407,9 @@ label[for="recetaSelect"] {
 .floating-menu {
     display: none;
     position: fixed;
-    bottom: 90px; /* Justo arriba del botón flotante */
+    bottom: 90px; 
     right: 20px;
-    background: transparent; /* Sin fondo */
+    background: transparent; 
     padding: 10px;
     z-index: 999; /* Sobre el overlay */
 }
@@ -430,7 +429,7 @@ label[for="recetaSelect"] {
 
 /* Hover en violeta */
 .floating-menu p:hover {
-    color: #9c27b0; /* Violeta más claro */
+    color: #9c27b0;
 }
 
 /* Modal de Ventas */
@@ -499,7 +498,7 @@ label[for="recetaSelect"] {
     font-size: 22px;
     border: none;
     cursor: pointer;
-    border-radius: 5px; /* Cuadrado con bordes ligeramente redondeados */
+    border-radius: 5px; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -518,7 +517,7 @@ label[for="recetaSelect"] {
 
 /* Estilo para agrandar el modal */
 .modal-content-wide {
-    max-height: 90vh; /* Aumentamos el espacio disponible */
+    max-height: 90vh; 
     overflow-y: auto; /* Habilita el scroll interno */
     position: relative;
     background-color: #e6d190;
@@ -535,7 +534,7 @@ label[for="recetaSelect"] {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 
     0 4px 6px rgba(0, 0, 0, 0.4), 
     inset 0 2px 5px rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(0, 0, 0, 0.6); /* Bordes más marcados */
+    border: 2px solid rgba(0, 0, 0, 0.6); 
 }
 
 .modal-content-wide h2 {
@@ -552,18 +551,17 @@ label[for="recetaSelect"] {
 
 .modal-content, .modal-content-wide {
     box-shadow: 
-        0 15px 40px rgba(0, 0, 0, 0.7),  /* Sombra grande fuerte abajo */
-        0 5px 15px rgba(0, 0, 0, 0.6),  /* Segunda sombra más corta */
-        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
-        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
-    border: 3px solid rgba(0, 0, 0, 0.8); /* Bordes más gruesos */
-    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
-    transition: transform 0.2s ease-in-out; /* Transición suave */
-    padding-bottom: 40px; /* Aumentá este valor si querés más espacio */
+        0 15px 40px rgba(0, 0, 0, 0.7),  
+        0 5px 15px rgba(0, 0, 0, 0.6),  
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), 
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); 
+    border: 3px solid rgba(0, 0, 0, 0.8); 
+    border-radius: 30px; 
+    transition: transform 0.2s ease-in-out; 
+    padding-bottom: 40px; 
 
 }
 
-/* Efecto al abrir el modal para que parezca que se infla */
 .modal-content-wide, .modal-content {
     animation: inflateEffect 0.1s ease-out;
 }
@@ -598,12 +596,12 @@ label[for="recetaSelect"] {
 .datos-cliente form {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Mantiene separación entre inputs */
-    margin-top: 60px; /* Ajusta este valor según necesites */
+    gap: 10px; 
+    margin-top: 60px; 
 }
 
 .addClientesForm {
-    margin-top: 30px; /* Ajusta este valor para bajar más o menos los inputs */
+    margin-top: 30px; 
 }
 
 /* Sección derecha: Nueva Venta */
@@ -617,13 +615,13 @@ label[for="recetaSelect"] {
 
 .detalle-table {
     width: 100%;
-    border-collapse: collapse !important;  /* Evita bordes dobles */
+    border-collapse: collapse !important;  
     background-color: white;
     margin-top: 20px;
 }
 
 
-/* ✅ Ajuste de las celdas de la tabla */
+/* Ajuste de las celdas de la tabla */
 .detalle-table th, .detalle-table td {
     border: 1px solid black;
     padding: 5px 10px;
@@ -631,7 +629,7 @@ label[for="recetaSelect"] {
     height: 30px; /* Ajusta altura de las filas */
 }
 
-/* ✅ Estiliza los encabezados */
+
 .detalle-table th {
     
     background-color: #dec26c;
@@ -641,17 +639,17 @@ label[for="recetaSelect"] {
 /* Contenedor para el botón "Agregar" */
 .add-button-container {
     display: flex;
-    justify-content: center; /* Centra el botón */
-    margin-bottom: 10px; /* Espacio con los botones de abajo */
+    justify-content: center; 
+    margin-bottom: 10px; 
 }
 
 /* Estilos para el botón "Agregar" */
 .add-circle-btn {
     width: 50px;
     height: 50px;
-    background-color: #5A3B81; /* Violeta */
+    background-color: #5A3B81; 
     color: white;
-    border-radius: 50%; /* Lo hace circular */
+    border-radius: 50%; 
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
@@ -659,20 +657,20 @@ label[for="recetaSelect"] {
     align-items: center;
     justify-content: center;
     box-shadow:
-        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
-        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
-    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), 
+        inset 0 5px 10px rgba(255, 255, 255, 0.3);
+    border-radius: 30px; 
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-/* Efecto hover profesional */
+
 .add-circle-btn:hover {
-    background-color: #7D58B3; /* Un violeta más claro */
+    background-color: #7D58B3; 
     transform: scale(1.1);
     box-shadow:
-        inset 0 -10px 15px rgba(0, 0, 0, 0.4), /* Efecto de profundidad interno */
-        inset 0 5px 10px rgba(255, 255, 255, 0.3); /* Luz arriba para efecto hinchado */
-    border-radius: 30px; /* Bordes bien redondeados para efecto "gordito" */
+        inset 0 -10px 15px rgba(0, 0, 0, 0.4), 
+        inset 0 5px 10px rgba(255, 255, 255, 0.3); 
+    border-radius: 30px; 
 }
 
 /* Efecto al hacer clic */
@@ -682,11 +680,11 @@ label[for="recetaSelect"] {
 
 .reporte-buttons {
     display: flex;
-    flex-direction: column; /* Coloca los botones en una columna */
-    align-items: center; /* Centra horizontalmente */
-    gap: 15px; /* Espacio entre los botones */
-    width: 100%; /* Asegura que el contenedor use todo el ancho */
-    margin-top: 20px; /* Ajuste opcional para bajar un poco */
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; 
+    width: 100%; 
+    margin-top: 20px; 
 }
 
 /* Ajuste adicional para los botones */
@@ -695,7 +693,7 @@ label[for="recetaSelect"] {
     padding: 10px 15px;
     font-size: 16px;
     cursor: pointer;
-    background-color: #5A3B81; /* Mismo estilo violeta */
+    background-color: #5A3B81; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -703,7 +701,7 @@ label[for="recetaSelect"] {
 }
 
 .reporte-buttons button:hover {
-    background-color: #341d4f; /* Oscurecer en hover */
+    background-color: #341d4f; 
 }
 
 /* 🔹 Contenedor de la alerta */
@@ -716,24 +714,24 @@ label[for="recetaSelect"] {
     text-align: center;
 }
 
-/* 🔸 Botón de alerta (rojo bordó y tamaño más pequeño) */
+
 .alerta-insumos {
-    background-color: #7a1c1c; /* Bordó fijo */
+    background-color: #7a1c1c; 
     color: white !important;
     font-weight: bold;
-    padding: 8px 12px !important;/* Tamaño más compacto */
+    padding: 8px 12px !important;
     border: 5px;
     border-color: #7a1c1c !important;
     border-radius: 5px;
     cursor: pointer;
     width: auto;
-    max-width: 250px !important;/* Hacemos que sea más chico */
-    font-size: 14px !important; /* Texto más pequeño */
+    max-width: 250px !important;
+    font-size: 14px !important; 
     transition: background-color 0.3s;
 }
 
 .alerta-insumos:hover {
-    background-color: #5c1313 !important; /* Un bordó más oscuro */
+    background-color: #5c1313 !important; 
 }
 
 /* 🔹 Detalle de alertas */
@@ -754,7 +752,7 @@ label[for="recetaSelect"] {
 @media (max-width: 960px) {
     /* Reducir el tamaño de los textos en un 25% */
     .main-button span {
-        font-size: clamp(30px, 4vw, 40px); /* 🔹 Reduce 25% en alturas menores */
+        font-size: clamp(30px, 4vw, 40px); /* Reduce 25% en alturas menores */
     }
 }
 
@@ -774,14 +772,14 @@ label[for="recetaSelect"] {
         display: grid;
         grid-template-columns: repeat(2, 1fr); /* 2 columnas */
         grid-gap: 80px; /* Reducimos el espacio entre botones */
-        justify-content: center; /* Centrar horizontalmente */
+        justify-content: center; 
         align-items: center;
-        align-content: center; /* Mantiene el conjunto alineado verticalmente */
+        align-content: center; 
         width: 100%; /* Asegurar que ocupa todo el ancho */
-        max-width: 400px; /* Para centrar bien */
-        margin: 0 auto; /* Centra en la pantalla */
-        padding-top: 100px; /* Espacio para no tapar el header */
-        height: calc(100vh - 120px); /* Ajuste dinámico según la pantalla */
+        max-width: 400px; 
+        margin: 0 auto; 
+        padding-top: 100px; 
+        height: calc(100vh - 120px); 
     }
 
    /* Subir los textos sin modificar la estructura HTML */
@@ -789,7 +787,7 @@ label[for="recetaSelect"] {
         font-size: clamp(30px, 5vw, 32px); /* Tamaño adaptable */
         display: block;
         position: relative;
-        top: -45px; /* 🔹 Sube el texto sin tocar el botón */
+        top: -45px; 
         text-align: center;
         width: 100%;
         z-index: 2; /* Mantiene el texto visible */
@@ -811,13 +809,13 @@ label[for="recetaSelect"] {
 
     /* Subir los textos sin modificar la estructura HTML */
     .main-button span {
-        font-size: clamp(30px, 5vw, 32px); /* Tamaño adaptable */
+        font-size: clamp(30px, 5vw, 32px); 
         display: block;
         position: relative;
-        top: -45px; /* 🔹 Sube el texto sin tocar el botón */
+        top: -45px; 
         text-align: center;
         width: 100%;
-        z-index: 2; /* Mantiene el texto visible */
+        z-index: 2; 
     }
 
     /* Ajustar botones de los modales */
@@ -829,10 +827,10 @@ label[for="recetaSelect"] {
     }
 
     .modal-buttons button {
-        flex: 1; /* Distribuye el espacio de manera uniforme */
-        font-size: 14px; /* Reduce un poco el tamaño */
-        padding: 8px 10px; /* Se ajusta sin perder usabilidad */
-        min-width: auto; /* Evita que se desborden */
+        flex: 1; 
+        font-size: 14px; 
+        padding: 8px 10px; 
+        min-width: auto;
     }
     
 }
