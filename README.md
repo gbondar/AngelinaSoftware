@@ -41,12 +41,18 @@ Si preferís **ver una demostración del funcionamiento** sin instalar ni config
 ## Estructura del proyecto
 
 AngelinaSoftware/
-│
+
+
 ├── app.py # Archivo principal de Flask
+
 ├── bbdd / sistema_ventas.db # Base de datos SQLite
+
 ├── templates/ # Archivo HTML 
+
 ├── static/ # CSS, JS
+
 ├── backups/ # Carpeta autogenerada con copias de seguridad
+
 ├── README.md # Este archivo
 
 
@@ -72,7 +78,7 @@ AngelinaSoftware/
 
 ## Contacto
 
-Si querés saber más sobre este proyecto o estás interesado en soluciones similares, podés escribirme o visitar mi [sitio web personal](https://gbondar.github.io/Portfolio/).
+Si querés saber más sobre este proyecto o estás interesado en soluciones similares, podés escribirme a gonza.bondar@gmail.com o visitar mi [sitio web personal](https://gbondar.github.io/Portfolio/).
 
 ---
 
