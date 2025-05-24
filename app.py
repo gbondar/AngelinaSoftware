@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import sqlite3
 import datetime
 import pandas as pd
@@ -12,12 +12,29 @@ from openpyxl.utils import get_column_letter
 from openpyxl.chart import PieChart, Reference
 import shutil
 
-app = Flask(__name__)
+
+# Ruta base del archivo app.py
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Inicialización de la app Flask
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'static')
+)
 CORS(app)
 
-DB_PATH = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\sistema_ventas.db'
-BACKUP_FOLDER = r'C:\Users\Gonzalo Bondar\Desktop\Ana Surak\backups'
-LOG_BACKUP = os.path.join(BACKUP_FOLDER, "ultimo_backup.txt")  # Registro el último backup
+# Ruta principal
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# Paths para la base de datos y backups
+BBDD_DIR = os.path.join(BASE_DIR, 'bbdd')
+DB_PATH = os.path.join(BBDD_DIR, 'sistema_ventas.db')
+BACKUP_FOLDER = os.path.join(BBDD_DIR, 'backups')
+LOG_BACKUP = os.path.join(BACKUP_FOLDER, 'ultimo_backup.txt')
+
 
 def backup_db():
     """Realiza un backup de la base de datos solo una vez por día."""

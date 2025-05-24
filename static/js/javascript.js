@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             ventas.forEach(venta => {
                 const row = document.createElement("tr");
-                row.setAttribute("data-venta-id", venta.venta_id); // ✅ Guarda el ID de la venta en la fila
+                row.setAttribute("data-venta-id", venta.venta_id); 
 
     
                 // ✅ Validar y formatear la fecha
@@ -1125,7 +1125,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!response.ok) throw new Error("Error al obtener recetas");
 
             const recetas = await response.json();
-            recetaSelect.innerHTML = ""; // Limpiar select antes de agregar nuevas opciones
+            recetaSelect.innerHTML = ""; 
 
             // Agregar opción por defecto
             const defaultOption = document.createElement("option");
@@ -1866,7 +1866,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(() => {
             alert("Insumo modificado con éxito");
-            closeModifModal();  // Cierra el modal correcto
+            closeModifModal(); 
             fetchInsumos();  
         })
         .catch(error => {
@@ -1956,7 +1956,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById("modifNombreReceta");
-                select.innerHTML = '<option value="">Selecciona una receta</option>'; // Resetear opciones
+                select.innerHTML = '<option value="">Selecciona una receta</option>'; 
     
                 data.forEach(receta => {
                     const option = document.createElement("option");
@@ -2092,12 +2092,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btnRecetas").addEventListener("click", fetchRecetas);
 
     function limpiarVentanaRecetas() {
-        document.getElementById("nombreReceta").value = "";  // Limpia el campo del nombre del producto
-        document.getElementById("precioReceta").value = "";  // Limpia el campo del precio
+        document.getElementById("nombreReceta").value = "";  
+        document.getElementById("precioReceta").value = "";  
     }
 
     function openAddModalRecetas() {
-        limpiarVentanaRecetas();  // 🔹 Limpia los campos antes de abrir el modal
+        limpiarVentanaRecetas();  
         document.getElementById("addModalRecetas").style.display = "flex";
     }
 
